@@ -1,0 +1,26 @@
+version: "3.7"
+services:
+  db:
+    image: postgres:latest
+    volumes:
+      - app-db-data:/var/lib/postgresql/data/
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=${DATABASE_USER}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_DB=${DATABASE_NAME}
+
+  api:
+    build: ./
+    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+    volumes:
+      - ./app:/app/
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+
+volumes:
+  app-db-data:

@@ -14,6 +14,11 @@ async def on_startup():
     await Tortoise.generate_schemas()
 
 
+@app.on_event('shutdown')
+async def on_shutdown():
+    await Tortoise.close_connections()
+
+
 @app.get("/app")
 def read_main():
     return {"message": "Hello World from main app"}

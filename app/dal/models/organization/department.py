@@ -12,5 +12,3 @@ class Department(Model, TimestampMixin):
 
     organization: fields.ForeignKeyRelation["Organization"] = fields.ForeignKeyField("models.Organization",
                                                                                      related_name='departments')
-    manager: fields.ForeignKeyRelation["Employee"] = fields.ForeignKeyField("models.Employee",
-                                                                            related_name='managed_departments')

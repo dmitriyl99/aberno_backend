@@ -1,12 +1,13 @@
 from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, status
-from fastapi import Depends, Body
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import Depends
 
-from .view_models import Token, LoginForm
+from .view_models import Token, LoginForm, CurrentUser
 
 from app.use_cases.auth.create_token_use_case import CreateTokenUseCase
+from app.dependencies import get_current_user
+from app.dal.models.auth.user import User
 
 
 router = APIRouter()
@@ -27,3 +28,19 @@ async def create_access_token(
         )
 
     return Token(**token_dict)
+
+
+@router.get("/me/")
+async def get_me(
+        current_user: Annotated[User, Depends(get_current_user)]
+):
+    await current_user.fetch_related('roles', 'permissions', 'employee')
+    return CurrentUser(
+        id=current_user.id,
+        name=current_user.name,
+        phone=current_user.phone,
+        created_at=current_user.created_at,
+        updated_at=current_user.updated_at,
+        roles=await current_user.roles,
+        permissions=await current_user.permissions
+    )

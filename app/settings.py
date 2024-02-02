@@ -13,6 +13,7 @@ class _Settings(BaseSettings):
 
     secret_key: str
     access_token_expires_minutes: int = 86400
+    jwt_algorithm: str
 
 
 settings = _Settings()

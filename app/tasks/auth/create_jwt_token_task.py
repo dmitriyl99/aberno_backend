@@ -11,5 +11,5 @@ class CreateJWTTokenTask:
         to_encode = data.copy()
         expire = datetime.now(timezone.utc) + self.expires_delta
         to_encode.update({"exp": expire})
-        encoded_jwt = jwt.encode(to_encode, settings.secret_key, algorithm='HS256')
+        encoded_jwt = jwt.encode(to_encode, settings.secret_key, algorithm=settings.jwt_algorithm)
         return encoded_jwt

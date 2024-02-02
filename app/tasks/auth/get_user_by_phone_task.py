@@ -1,4 +1,4 @@
-from app.dal.models.auth.user import User
+from app.core.models.auth.user import User
 
 
 class GetUserByPhoneTask:

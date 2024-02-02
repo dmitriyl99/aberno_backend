@@ -1,7 +1,4 @@
-from typing import Annotated
-
-from fastapi import Depends
-from app.dal.models.auth.user import User
+from app.core.models.auth.user import User
 from app.core.services.auth import JWTAuthService
 from passlib.context import CryptContext
 

@@ -2,7 +2,7 @@ from fastapi import HTTPException, status
 from jose import JWTError
 
 from ..services.auth import JWTAuthService
-from app.dal.models.auth.user import User
+from app.core.models.auth.user import User
 from app.tasks.auth.get_user_by_id_task import GetUserByIdTask
 
 

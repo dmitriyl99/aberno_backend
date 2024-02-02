@@ -2,9 +2,9 @@ from typing import List
 
 from tortoise.models import Model
 from tortoise import fields
-from app.dal.models import TimestampMixin
-from app.dal.models.auth.permission import Permission
-from app.dal.models.auth.role import Role
+from app.core.models import TimestampMixin
+from app.core.models.auth.permission import Permission
+from app.core.models.auth.role import Role
 
 
 class User(Model, TimestampMixin):

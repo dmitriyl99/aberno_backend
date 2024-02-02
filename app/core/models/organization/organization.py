@@ -1,7 +1,7 @@
 from tortoise.models import Model
 from tortoise.fields import IntField, TextField
 
-from app.dal.models import TimestampMixin
+from app.core.models import TimestampMixin
 
 
 class Organization(Model, TimestampMixin):

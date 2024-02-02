@@ -13,13 +13,13 @@ async def on_startup():
     await Tortoise.init(
         db_url='sqlite://db.sqlite3',
         modules={'models': [
-            'app.dal.models.auth.user',
-            'app.dal.models.auth.permission',
-            'app.dal.models.auth.role',
+            'app.core.models.auth.user',
+            'app.core.models.auth.permission',
+            'app.core.models.auth.role',
 
-            'app.dal.models.organization.department',
-            'app.dal.models.organization.employee',
-            'app.dal.models.organization.organization'
+            'app.core.models.organization.department',
+            'app.core.models.organization.employee',
+            'app.core.models.organization.organization'
         ]}
     )
     await Tortoise.generate_schemas()

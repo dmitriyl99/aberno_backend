@@ -1,9 +1,9 @@
 from tortoise.models import Model
 from tortoise.fields import IntField, ForeignKeyField, ForeignKeyRelation, DateField, OneToOneField, OnDelete
 
-from app.dal.models import TimestampMixin
-from app.dal.models.auth.user import User
-from app.dal.models.organization.organization import Organization
+from app.core.models import TimestampMixin
+from app.core.models.auth.user import User
+from app.core.models.organization.organization import Organization
 
 
 class Employee(Model, TimestampMixin):

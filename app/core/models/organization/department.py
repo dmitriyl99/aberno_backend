@@ -1,9 +1,9 @@
 from tortoise.models import Model
 from tortoise import fields
 
-from app.dal.models import TimestampMixin
-from app.dal.models.organization.organization import Organization
-from app.dal.models.organization.employee import Employee
+from app.core.models import TimestampMixin
+from app.core.models.organization.organization import Organization
+from app.core.models.organization.employee import Employee
 
 
 class Department(Model, TimestampMixin):

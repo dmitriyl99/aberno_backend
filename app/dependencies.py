@@ -6,7 +6,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 
 from app.settings import settings
-from app.dal.models.auth.user import User
+from app.core.models.auth.user import User
 from app.tasks.auth.get_user_by_phone_task import GetUserByPhoneTask
 from app.tasks.auth.get_user_by_id_task import GetUserByIdTask
 from app.core.facades.auth import Auth

@@ -12,7 +12,7 @@ class LoginForm(BaseModel):
     password: str
 
 
-class CurrentUser(BaseModel):
+class CurrentUserViewModel(BaseModel):
     id: int
     name: str
     phone: str
@@ -20,4 +20,14 @@ class CurrentUser(BaseModel):
     updated_at: datetime
     roles: list
     permissions: list | None
+
+
+class RoleViewModel(BaseModel):
+    id: int
+    name: str
+
+
+class PermissionViewModel(BaseModel):
+    id: int
+    name: str
 

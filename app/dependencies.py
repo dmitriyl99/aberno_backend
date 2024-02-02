@@ -8,6 +8,8 @@ from jose import jwt, JWTError
 from app.settings import settings
 from app.dal.models.auth.user import User
 from app.tasks.auth.get_user_by_phone_task import GetUserByPhoneTask
+from app.tasks.auth.get_user_by_id_task import GetUserByIdTask
+from app.core.facades.auth import Auth
 
 
 async def get_current_user(
@@ -32,3 +34,10 @@ async def get_current_user(
         raise credentials_exception
 
     return user
+
+
+async def verify_authenticated_user(
+    token: Annotated[str, Depends(OAuth2PasswordBearer(tokenUrl='token'))],
+    get_user_by_id_task: Annotated[GetUserByIdTask, Depends(GetUserByIdTask)]
+):
+    await Auth.authorize_user(token, 'jwt', get_user_by_id_task)

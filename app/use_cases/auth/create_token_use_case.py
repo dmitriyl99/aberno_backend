@@ -21,7 +21,7 @@ class CreateTokenUseCase:
         password_verified = self.pwd_context.verify(password, user.password)
         if not password_verified:
             return None
-        access_token = self.create_jwt_token_task.run(data={"sub": user.phone})
+        access_token = self.create_jwt_token_task.run(data={"sub": str(user.id)})
 
         return {
             'access_token': access_token,

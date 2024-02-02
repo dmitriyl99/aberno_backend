@@ -6,8 +6,8 @@ from fastapi import Depends
 from .view_models import Token, LoginForm, CurrentUserViewModel, RoleViewModel, PermissionViewModel
 
 from app.use_cases.auth.create_token_use_case import CreateTokenUseCase
-from app.dependencies import get_current_user
-from app.dal.models.auth.user import User
+from app.dependencies import verify_authenticated_user
+from app.core.facades.auth import Auth
 
 
 router = APIRouter()
@@ -30,10 +30,10 @@ async def create_access_token(
     return Token(**token_dict)
 
 
-@router.get("/me/", response_model=CurrentUserViewModel)
+@router.get("/me/", response_model=CurrentUserViewModel, dependencies=[Depends(verify_authenticated_user)])
 async def get_me(
-        current_user: Annotated[User, Depends(get_current_user)]
 ):
+    current_user = Auth.get_current_user()
     await current_user.fetch_related('roles', 'permissions', 'employee')
     return CurrentUserViewModel(
         id=current_user.id,

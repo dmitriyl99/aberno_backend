@@ -30,7 +30,7 @@ async def create_access_token(
     return Token(**token_dict)
 
 
-@router.get("/me/")
+@router.get("/me/", response_model=CurrentUserViewModel)
 async def get_me(
         current_user: Annotated[User, Depends(get_current_user)]
 ):

@@ -1,37 +1,22 @@
 from typing import List
 
-from tortoise.models import Model
-from tortoise import fields
+from .. import Base
+from sqlalchemy import String, Text
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from .associations import roles_users, permissions_users
+
 from app.core.models import TimestampMixin
 from app.core.models.auth.permission import Permission
 from app.core.models.auth.role import Role
 
 
-class User(Model, TimestampMixin):
-    id = fields.IntField(pk=True)
-    name = fields.CharField(200)
-    phone = fields.CharField(max_length=12)
-    password = fields.TextField()
+class User(Base, TimestampMixin):
+    __tablename__ = "users"
 
-    roles: fields.ManyToManyRelation["Role"] = fields.ManyToManyField("models.Role", related_name='users', through='users_roles')
-    permissions: fields.ManyToManyRelation["Permission"] = fields.ManyToManyField("models.Permission",
-                                                                                  related_name='users',
-                                                                                  through='users_permissions')
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(200))
+    username: Mapped[str] = mapped_column(String(100))
+    password: Mapped[str] = mapped_column(Text)
 
-    async def has_role(self, name: str):
-        role = self.roles.filter(name=name).first()
-        return role is not None
-
-    async def has_permission(self, permission: str):
-        permissions = await self.get_all_permissions()
-        return len(list(filter(lambda x: x.name == permission, permissions))) > 0
-
-    async def get_all_permissions(self) -> List[Permission]:
-        all_permissions = await self.permissions
-        async for role in self.roles:
-            all_permissions.extend(await role.permissions)
-
-        return all_permissions
-
-    class Meta:
-        table = 'users'
+    roles: Mapped[List[Role]] = relationship(secondary=roles_users)
+    permissions: Mapped[List[Permission]] = relationship(secondary=permissions_users)

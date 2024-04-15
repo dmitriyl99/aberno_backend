@@ -1,14 +1,17 @@
-from tortoise.models import Model
-from tortoise import fields
+from typing import List
 
+from sqlalchemy import Text, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from .. import Base
 from app.core.models import TimestampMixin
-from app.core.models.organization.organization import Organization
-from app.core.models.organization.employee import Employee
 
 
-class Department(Model, TimestampMixin):
-    id = fields.IntField(pk=True)
-    name = fields.TextField()
+class Department(Base, TimestampMixin):
+    __tablename__ = "departments"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(Text)
+    organization_id: Mapped[int] = mapped_column(ForeignKey("organizations.id"))
 
-    organization: fields.ForeignKeyRelation["Organization"] = fields.ForeignKeyField("models.Organization",
-                                                                                     related_name='departments')
+    organization: Mapped["Organization"] = relationship(back_populates='departments')
+    employees: Mapped[List["Employee"]] = relationship(back_populates='department')

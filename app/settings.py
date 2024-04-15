@@ -18,29 +18,3 @@ class _Settings(BaseSettings):
 
 
 settings = _Settings()
-
-
-TORTOISE_ORM = {
-    "connections": {
-        "default":
-            f"postgres://"
-            f"{settings.database_user}:"
-            f"{settings.database_password}@"
-            f"{settings.database_host}:"
-            f"{settings.database_port}/{settings.database_name}"},
-    "apps": {
-        "models": {
-            "models": [
-                'app.core.models.auth.user',
-                'app.core.models.auth.permission',
-                'app.core.models.auth.role',
-
-                'app.core.models.organization.department',
-                'app.core.models.organization.employee',
-                'app.core.models.organization.organization',
-                'aerich.models'
-            ],
-            "default_connection": "default"
-        }
-    }
-}

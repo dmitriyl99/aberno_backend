@@ -1,6 +1,11 @@
-from tortoise import fields
+from sqlalchemy import Column, DateTime, func
+from sqlalchemy.orm import DeclarativeBase
+
+
+class Base(DeclarativeBase):
+    __mapper_args__ = {'always_refresh': True}
 
 
 class TimestampMixin:
-    created_at = fields.DatetimeField(null=True, auto_now_add=True)
-    updated_at = fields.DatetimeField(null=True, auto_now=True)
+    created_at = Column(DateTime, default=func.now(), nullable=False)
+    updated_at = Column(DateTime, onupdate=func.now(), nullable=False)

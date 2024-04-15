@@ -6,11 +6,7 @@ from app.settings import settings
 
 def _create_db() -> Engine:
     engine = _create_sqlalchemy_engine(
-        f"postgresql://"
-        f"{settings.database_user}:"
-        f"{settings.database_password}@"
-        f"{settings.database_host}/"
-        f"{settings.database_name}"
+        f"postgresql://{settings.database_user}:{settings.database_password}@{settings.database_host}/{settings.database_name}"
     )
     return engine
 

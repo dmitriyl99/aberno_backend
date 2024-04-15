@@ -3,6 +3,11 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
+from app.core.models import Base
+from app.core.models import auth, organization
+from app.dal import _create_db
+from app.settings import settings
+
 from alembic import context
 
 # this is the Alembic Config object, which provides
@@ -18,7 +23,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = None
+target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -38,7 +43,11 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
+    url = (f"postgresql://"
+           f"{settings.database_user}:"
+           f"{settings.database_password}@"
+           f"{settings.database_host}/"
+           f"{settings.database_name}")
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -57,11 +66,7 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
-    connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+    connectable = _create_db()
 
     with connectable.connect() as connection:
         context.configure(

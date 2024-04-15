@@ -22,4 +22,4 @@ class Employee(Base, TimestampMixin):
 
     user: Mapped["User"] = relationship(back_populates='employee')
     organization: Mapped["Organization"] = relationship(back_populates='employees')
-    department: Mapped["Department"] = relationship(related_name='employees')
+    department: Mapped["Department"] = relationship(back_populates='employees')

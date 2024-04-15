@@ -23,7 +23,7 @@ def upgrade() -> None:
                     sa.Column('employee_id', sa.Integer(), nullable=False),
                     sa.Column('organization_id', sa.Integer(), nullable=False),
                     sa.Column('department_id', sa.Integer(), nullable=False),
-                    sa.Column('status', sa.Enum('ON_WORK', 'OFF_DAY', 'SICK', 'REASONED'), nullable=False),
+                    sa.Column('status', sa.String, nullable=False),
                     sa.Column('note', sa.String(200), nullable=True),
                     sa.Column('created_at', sa.DateTime(), nullable=False),
                     sa.Column('updated_at', sa.DateTime(), nullable=False),

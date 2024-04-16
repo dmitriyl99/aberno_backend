@@ -18,7 +18,7 @@ async def create_access_token(
         form: LoginForm,
         use_case: Annotated[CreateTokenUseCase, Depends(CreateTokenUseCase)]
 ) -> Token:
-    token_dict = await use_case.execute(form.phone, form.password)
+    token_dict = use_case.execute(form.username, form.password)
 
     if not token_dict:
         raise HTTPException(
@@ -34,11 +34,10 @@ async def create_access_token(
 async def get_me(
 ):
     current_user = Auth.get_current_user()
-    await current_user.fetch_related('roles', 'permissions', 'employee')
     return CurrentUserViewModel(
         id=current_user.id,
         name=current_user.name,
-        phone=current_user.phone,
+        username=current_user.username,
         created_at=current_user.created_at,
         updated_at=current_user.updated_at,
         roles=list(map(lambda x: RoleViewModel(

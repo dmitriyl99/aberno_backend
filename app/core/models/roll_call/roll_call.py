@@ -1,3 +1,4 @@
+from .location import Location
 from .. import Base, TimestampMixin
 
 from sqlalchemy import Enum, ForeignKey, String

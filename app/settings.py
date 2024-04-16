@@ -1,3 +1,5 @@
+import os
+
 from pydantic_settings import BaseSettings
 
 import dotenv
@@ -6,6 +8,7 @@ dotenv.load_dotenv(".env")
 
 
 class _Settings(BaseSettings):
+    environment: str
     database_host: str
     database_user: str
     database_password: str

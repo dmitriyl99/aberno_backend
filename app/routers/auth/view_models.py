@@ -9,7 +9,7 @@ class Token(BaseModel):
 
 
 class LoginForm(BaseModel):
-    phone: str
+    username: str
     password: str
 
 
@@ -26,7 +26,7 @@ class PermissionViewModel(BaseModel):
 class CurrentUserViewModel(BaseModel):
     id: int
     name: str
-    phone: str
+    username: str
     created_at: datetime
     updated_at: datetime
     roles: List[RoleViewModel] | None

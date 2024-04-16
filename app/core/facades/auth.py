@@ -23,7 +23,7 @@ class Auth:
             user_id: str = service.authorize_token(token)
             if user_id is None:
                 raise credentials_exception
-            user = await get_user_by_id_task.run(int(user_id))
+            user = get_user_by_id_task.run(int(user_id))
             if user is None:
                 raise credentials_exception
             Auth.__current_user = user

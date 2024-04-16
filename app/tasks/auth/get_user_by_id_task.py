@@ -1,7 +1,7 @@
 from typing import Annotated
 from fastapi import Depends
 from app.core.models.auth.user import User
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, joinedload
 from app.dal import get_session
 
 
@@ -11,5 +11,7 @@ class GetUserByIdTask:
 
     def run(self, id: int) -> User | None:
         with self.session() as session:
-            user = session.query(User).filter(User.id == id).first()
+            user = session.query(User).options(
+                joinedload(User.roles), joinedload(User.permissions)
+            ).filter(User.id == id).first()
         return user

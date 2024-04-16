@@ -1,6 +1,4 @@
-from fastapi import APIRouter, Depends
-
-from app.dependencies import verify_authenticated_user
+from .roll_call import router as roll_call_router
 
 
-router = APIRouter(dependencies=[Depends(verify_authenticated_user)])
+routers = [roll_call_router]

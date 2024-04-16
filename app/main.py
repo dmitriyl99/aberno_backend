@@ -11,7 +11,8 @@ app = FastAPI(debug=settings.environment in ['local', 'debug'], title="Aberno AP
 app.include_router(router=authentication.router, prefix='/api/auth')
 for router in organization.routers:
     app.include_router(router, prefix='/api/organization', tags=['organizations'])
-app.include_router(router=roll_call.router, prefix='/api/roll-call')
+for router in roll_call.routers:
+    app.include_router(router=router, prefix='/api')
 
 
 @app.get("/app")

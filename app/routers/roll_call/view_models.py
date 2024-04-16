@@ -9,8 +9,14 @@ class RollCallStatusEnum(str, Enum):
     REASONED = 'REASONED'
 
 
+class RollCallLocation(BaseModel):
+    lat: float
+    lng: float
+
+
 class RollCallViewModel(BaseModel):
     status: RollCallStatusEnum
     note: str | None = None
     organization_id: int
     department_id: int
+    location: RollCallLocation | None = None

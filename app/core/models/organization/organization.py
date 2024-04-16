@@ -1,6 +1,6 @@
 from typing import List
 
-from sqlalchemy import Text
+from sqlalchemy import Text, Float
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .. import Base
@@ -14,6 +14,8 @@ class Organization(Base, TimestampMixin):
     name: Mapped[str] = mapped_column(Text)
     legal_name: Mapped[str] = mapped_column(Text)
     legal_name_prefix: Mapped[str] = mapped_column(Text)
+    location_lat: Mapped[float] = mapped_column(Float)
+    location_lng: Mapped[float] = mapped_column(Float)
 
     departments: Mapped[List["Department"]] = relationship(back_populates='organization')
     employees: Mapped[List["Employee"]] = relationship(back_populates='organization')

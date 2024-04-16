@@ -24,6 +24,8 @@ def upgrade() -> None:
                     sa.Column('name', sa.Text(), nullable=False),
                     sa.Column('legal_name', sa.Text(), nullable=False),
                     sa.Column('legal_name_prefix', sa.Text(), nullable=False),
+                    sa.Column('location_lat', sa.Float, nullable=True),
+                    sa.Column("location_lng", sa.Float, nullable=True),
                     sa.Column('created_at', sa.DateTime(), nullable=False),
                     sa.Column('updated_at', sa.DateTime(), nullable=False),
                     sa.PrimaryKeyConstraint('id')

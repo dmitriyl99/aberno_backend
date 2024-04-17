@@ -17,6 +17,4 @@ class RollCallLocation(BaseModel):
 class RollCallViewModel(BaseModel):
     status: RollCallStatusEnum
     note: str | None = None
-    organization_id: int
-    department_id: int
     location: RollCallLocation | None = None

@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 from enum import Enum
 
+from datetime import date
+
 
 class RollCallStatusEnum(str, Enum):
     ON_WORK = 'ON_WORK'
@@ -14,7 +16,14 @@ class RollCallLocation(BaseModel):
     lng: float
 
 
+class RollCallSickLeave(BaseModel):
+    note: str
+    date_from: date
+    date_to: date
+
+
 class RollCallViewModel(BaseModel):
     status: RollCallStatusEnum
     note: str | None = None
     location: RollCallLocation | None = None
+    sick_leave: RollCallSickLeave | None = None

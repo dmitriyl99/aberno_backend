@@ -71,7 +71,7 @@ class CreateRollCallUseCase:
                     detail='Sick leave information doesn\'t sent'
                 )
             sick_leave = SickLeave(
-                note=data.sick_leave.note,
+                note=data.note,
                 date_from=data.sick_leave.date_from,
                 date_to=data.sick_leave.date_to,
                 employee_id=employee.id

@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 
 from .view_models import RollCallViewModel
 
@@ -12,7 +12,7 @@ from app.use_cases.roll_call.create_roll_call_use_case import CreateRollCallUseC
 router = APIRouter(prefix='/roll-call', tags=['roll-call'], dependencies=[Depends(verify_authenticated_user)])
 
 
-@router.post("/")
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_roll_call(
         roll_call: RollCallViewModel,
         create_roll_call_use_case: Annotated[CreateRollCallUseCase, Depends(CreateRollCallUseCase)]

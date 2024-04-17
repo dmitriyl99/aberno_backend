@@ -17,7 +17,6 @@ class RollCallLocation(BaseModel):
 
 
 class RollCallSickLeave(BaseModel):
-    note: str
     date_from: date
     date_to: date
 

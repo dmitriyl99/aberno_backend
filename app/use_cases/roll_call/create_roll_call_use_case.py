@@ -89,6 +89,7 @@ class CreateRollCallUseCase:
                 sick_leave.roll_call_id = roll_call.id
                 session.add(sick_leave)
             session.commit()
+            session.refresh(roll_call)
 
         return roll_call
 

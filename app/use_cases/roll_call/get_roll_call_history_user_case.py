@@ -32,11 +32,10 @@ class GetRollCallHistoryUseCase:
                 RollCall.department_id == employee.department_id
             )
 
-            date_to = datetime(date_to.year, date_to.month, date_to.day, 23, 59, 59)
-
             if date_from:
                 query = query.filter(RollCall.created_at >= date_from)
             if date_to:
+                date_to = datetime(date_to.year, date_to.month, date_to.day, 23, 59, 59)
                 query = query.filter(RollCall.created_at <= date_to)
 
             return query.all()

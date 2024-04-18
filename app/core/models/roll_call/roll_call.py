@@ -1,4 +1,5 @@
 from .location import Location
+from .sick_leave import SickLeave
 from .. import Base, TimestampMixin
 
 from sqlalchemy import Enum, ForeignKey, String
@@ -20,3 +21,4 @@ class RollCall(Base, TimestampMixin):
     organization: Mapped["Organization"] = relationship()
     department: Mapped["Department"] = relationship()
     location: Mapped["Location"] = relationship(back_populates='roll_call')
+    sick_leave: Mapped["SickLeave"] = relationship()

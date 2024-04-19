@@ -45,7 +45,7 @@ class CreateRollCallUseCase:
 
         if data.status == RollCallStatusEnum.ON_WORK:
             if ((employee.organization.location_lat and employee.organization.location_lng)
-                    and (data.location.lat and data.location.lng)):
+                    and data.location):
                 distance = geopy.distance.geodesic(
                     (employee.organization.location_lat, employee.organization.location_lng),
                     (data.location.lat, data.location.lng)

@@ -32,7 +32,7 @@ class RollCallSickLeaveResponse(BaseModel):
     id: int
     date_from: date
     date_to: date
-    note: str
+    note: str | None = None
 
 
 class RollCallResponse(BaseModel):

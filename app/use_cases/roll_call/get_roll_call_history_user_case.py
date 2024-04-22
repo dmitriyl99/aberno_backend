@@ -30,7 +30,7 @@ class GetRollCallHistoryUseCase:
                 RollCall.organization_id == employee.organization_id
             ).filter(
                 RollCall.department_id == employee.department_id
-            )
+            ).order_by(RollCall.created_at.desc())
 
             if date_from:
                 query = query.filter(RollCall.created_at >= date_from)

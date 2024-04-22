@@ -77,7 +77,7 @@ async def get_roll_call_calendar_status(
             ))
         date_roll_call = None
         if len(filtered_roll_calls) > 0:
-            date_roll_call = filtered_roll_calls[-1]
+            date_roll_call = filtered_roll_calls[0]
         result[current_date.strftime('%Y-%m-%d')] = date_roll_call.status if date_roll_call else None
         current_date += timedelta(days=1)
         print(current_date.strftime('%Y-%m-%d'))

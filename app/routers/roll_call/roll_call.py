@@ -95,10 +95,10 @@ async def get_roll_call_calendar_status(
     )
     for roll_call in sickness_roll_calls:
         current_date = roll_call.sick_leave.date_from
-        current_date_str = current_date.strftime('%Y-%m-%d')
         while current_date <= roll_call.sick_leave.date_to:
+            current_date_str = current_date.strftime('%Y-%m-%d')
             if current_date_str in result and not result[current_date_str]:
-                result[current_date.strftime('%Y-%m-%d')] = 'SICK'
+                result[current_date_str] = 'SICK'
             current_date += timedelta(days=1)
 
     return result

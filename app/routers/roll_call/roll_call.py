@@ -1,5 +1,6 @@
 from typing import Annotated, List
-from datetime import date
+from datetime import date, timedelta
+import calendar
 
 from fastapi import APIRouter, Depends, status
 
@@ -52,3 +53,34 @@ async def get_roll_call_history(
             note=roll_call.sick_leave.note
         ) if roll_call.sick_leave else None
     ), roll_call_history))
+
+
+@router.get("/calendar/status/", status_code=status.HTTP_200_OK)
+async def get_roll_call_calendar_status(
+        get_roll_call_history_use_case: Annotated[GetRollCallHistoryUseCase, Depends(GetRollCallHistoryUseCase)],
+        filter_date: date | None = None
+):
+    if not filter_date:
+        filter_date = date.today()
+    start_date = filter_date.replace(day=1)
+    end_date = filter_date.replace(day=calendar.monthrange(filter_date.year, filter_date.month)[1])
+
+    roll_call_history = get_roll_call_history_use_case.execute(
+        Auth.get_current_user(), start_date, end_date
+    )
+    result = {}
+    current_date = start_date
+    while current_date <= end_date:
+        filtered_roll_calls = list(
+            filter(
+                lambda r: r.created_at.date() == current_date, roll_call_history
+            ))
+        date_roll_call = None
+        if len(filtered_roll_calls) > 0:
+            date_roll_call = filtered_roll_calls[-1]
+        result[current_date.strftime('%Y-%m-%d')] = date_roll_call.status if date_roll_call else None
+        current_date += timedelta(days=1)
+        print(current_date.strftime('%Y-%m-%d'))
+
+    return result
+

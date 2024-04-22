@@ -2,7 +2,7 @@ from typing import Annotated, List
 from datetime import date, timedelta
 import calendar
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, HTTPException
 
 from .view_models import RollCallViewModel, RollCallResponse, RollCallSickLeaveResponse, RollCallStatusEnum
 
@@ -58,12 +58,21 @@ async def get_roll_call_history(
 @router.get("/calendar/status/", status_code=status.HTTP_200_OK)
 async def get_roll_call_calendar_status(
         get_roll_call_history_use_case: Annotated[GetRollCallHistoryUseCase, Depends(GetRollCallHistoryUseCase)],
-        filter_date: date | None = None
+        filter_date: date | None = None,
+        filter_type: str = 'monthly'
 ):
     if not filter_date:
         filter_date = date.today()
+    if filter_type not in ['monthly', 'weekly']:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='Invalid filter type. Only "monthly" and "weekly" allowed'
+        )
     start_date = filter_date.replace(day=1)
     end_date = filter_date.replace(day=calendar.monthrange(filter_date.year, filter_date.month)[1])
+    if filter_type == 'weekly':
+        start_date = filter_date - timedelta(days=filter_date.weekday())
+        end_date = start_date + timedelta(days=6)
 
     roll_call_history = get_roll_call_history_use_case.execute(
         Auth.get_current_user(), start_date, end_date

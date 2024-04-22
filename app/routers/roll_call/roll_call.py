@@ -4,7 +4,7 @@ import calendar
 
 from fastapi import APIRouter, Depends, status
 
-from .view_models import RollCallViewModel, RollCallResponse, RollCallSickLeaveResponse
+from .view_models import RollCallViewModel, RollCallResponse, RollCallSickLeaveResponse, RollCallStatusEnum
 
 from app.core.facades.auth import Auth
 from app.dependencies import verify_authenticated_user
@@ -80,6 +80,16 @@ async def get_roll_call_calendar_status(
             date_roll_call = filtered_roll_calls[0]
         result[current_date.strftime('%Y-%m-%d')] = date_roll_call.status if date_roll_call else None
         current_date += timedelta(days=1)
+
+    sickness_roll_calls = filter(
+        lambda r: r.status == RollCallStatusEnum.SICK, roll_call_history
+    )
+    for roll_call in sickness_roll_calls:
+        current_date = roll_call.sick_leave.date_from
+        while current_date <= roll_call.sick_leave.date_to:
+            if not result[current_date.strftime('%Y-%m-%d')]:
+                result[current_date.strftime('%Y-%m-%d')] = 'SICK'
+            current_date += timedelta(days=1)
 
     return result
 

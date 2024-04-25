@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 from app.routers.auth import authentication
-from app.routers import organization, roll_call
+from app.routers import organization, roll_call, superadmin
 
 from app.settings import settings
 
@@ -13,3 +13,4 @@ for router in organization.routers:
     app.include_router(router, prefix='/api/organization', tags=['organizations'])
 for router in roll_call.routers:
     app.include_router(router=router, prefix='/api')
+app.include_router(superadmin.router, prefix='/api')

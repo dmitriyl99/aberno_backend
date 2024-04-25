@@ -36,7 +36,24 @@ async def get_current_user(
 
 
 async def verify_authenticated_user(
-    token: Annotated[str, Depends(OAuth2PasswordBearer(tokenUrl='token'))],
-    get_user_by_id_task: Annotated[GetUserByIdTask, Depends(GetUserByIdTask)]
+        token: Annotated[str, Depends(OAuth2PasswordBearer(tokenUrl='token'))],
+        get_user_by_id_task: Annotated[GetUserByIdTask, Depends(GetUserByIdTask)]
 ):
     await Auth.authorize_user(token, 'jwt', get_user_by_id_task)
+
+
+async def verify_admin_user(
+        get_user_by_id_task: Annotated[GetUserByIdTask, Depends(GetUserByIdTask)]
+):
+    user = Auth.get_current_user()
+    error = HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN, detail="Could not authorize admin user"
+    )
+    if not user:
+        raise error
+    admin_role_filter = filter(
+        lambda role: role.name == 'Admin', user.roles
+    )
+
+    if len(list(admin_role_filter)) == 0:
+        raise error

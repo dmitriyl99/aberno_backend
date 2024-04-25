@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, status, HTTPException
 
 from app.use_cases.organization import (CreateOrganizationUseCase, GetOrganizationByIdUseCase,
                                         GetOrganizationsCase, UpdateOrganizationUseCase, DeleteOrganizationUseCase)
-from .view_mdoels import CreateOrganizationViewModel, OrganizationResponse
+from .view_models import CreateOrganizationViewModel, OrganizationResponse
 
 router = APIRouter(prefix='/organizations', tags=['admin'])
 

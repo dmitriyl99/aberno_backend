@@ -15,6 +15,11 @@ class CreateOrganizationViewModel(BaseModel):
     location_lng: float | None = None
 
 
+class CreateDepartmentViewModel(BaseModel):
+    name: str
+    organization_id: int
+
+
 class DepartmentResponse(BaseModel):
     id: int
     name: str

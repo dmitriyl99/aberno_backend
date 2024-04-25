@@ -6,7 +6,7 @@ from app.use_cases.organization import (CreateOrganizationUseCase, GetOrganizati
                                         GetOrganizationsCase, UpdateOrganizationUseCase, DeleteOrganizationUseCase)
 from .view_models import CreateOrganizationViewModel, OrganizationResponse
 
-router = APIRouter(prefix='/organizations', tags=['admin'])
+router = APIRouter(prefix='/organizations', tags=['admin-organizations'])
 
 
 @router.get('/', status_code=status.HTTP_200_OK, response_model=List[OrganizationResponse])

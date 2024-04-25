@@ -1,10 +1,10 @@
 from datetime import datetime
-from typing import List
+from typing import List, Any
 
 from pydantic import BaseModel
 from sqlalchemy import inspect
 
-from app.core.models.organization import Organization
+from app.core.models.organization import Organization, Department
 
 
 class CreateOrganizationViewModel(BaseModel):
@@ -20,9 +20,31 @@ class CreateDepartmentViewModel(BaseModel):
     organization_id: int
 
 
+class EmployeeResponse(BaseModel):
+    id: int
+    name: str
+
+
 class DepartmentResponse(BaseModel):
     id: int
     name: str
+    organization: object | None = None
+
+    created_at: datetime
+    updated_at: datetime
+
+    @staticmethod
+    def from_model(model: Department):
+        response = DepartmentResponse(
+            id=model.id,
+            name=model.name,
+            created_at=model.created_at,
+            updated_at=model.updated_at
+        )
+        if 'organization' in model.__dict__:
+            response.organization = OrganizationResponse.from_model(model.organization)
+
+        return response
 
 
 class OrganizationResponse(CreateOrganizationViewModel):

@@ -1,10 +1,10 @@
-from datetime import datetime
+from datetime import datetime, date
 from typing import List, Any
 
 from pydantic import BaseModel
-from sqlalchemy import inspect
 
-from app.core.models.organization import Organization, Department
+from app.core.models.organization import Organization, Department, Employee
+from app.routers.auth.view_models import CurrentUserViewModel
 
 
 class CreateOrganizationViewModel(BaseModel):
@@ -20,9 +20,15 @@ class CreateDepartmentViewModel(BaseModel):
     organization_id: int
 
 
-class EmployeeResponse(BaseModel):
-    id: int
+class CreateEmployeeViewModel(BaseModel):
     name: str
+    username: str
+    password: str | None = None
+    password_confirmation: str | None = None
+
+    birth_date: date
+    phone: str
+    department_id: int
 
 
 class DepartmentResponse(BaseModel):
@@ -44,6 +50,40 @@ class DepartmentResponse(BaseModel):
         if 'organization' in model.__dict__:
             response.organization = OrganizationResponse.from_model(model.organization)
 
+        return response
+
+
+class EmployeeResponse(BaseModel):
+    id: int
+    phone: str
+    birth_date: date
+    user: CurrentUserViewModel | None = None
+    department: DepartmentResponse | None = None
+
+    created_at: datetime
+    updated_at: datetime
+
+    @staticmethod
+    def from_model(model: Employee):
+        response = EmployeeResponse(
+            id=model.id,
+            phone=model.phone,
+            birth_date=model.birth_date,
+            created_at=model.created_at,
+            updated_at=model.updated_at
+        )
+        if 'department' in model.__dict__:
+            response.department = DepartmentResponse.from_model(model.department)
+        if 'user' in model.__dict__:
+            response.user = CurrentUserViewModel(
+                id=model.user.id,
+                name=model.user.name,
+                username=model.user.username,
+                created_at=model.user.created_at,
+                updated_at=model.user.updated_at,
+                roles=None,
+                permissions=None,
+            )
         return response
 
 

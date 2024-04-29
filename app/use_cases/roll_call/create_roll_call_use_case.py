@@ -13,22 +13,22 @@ from app.routers.roll_call.view_models import RollCallViewModel, RollCallStatusE
 from app.core.models.roll_call.roll_call import RollCall, Location
 from app.core.models.auth import User
 from app.tasks.organization.get_current_employee_task import GetCurrentEmployeeTask
-from app.use_cases.organization import GetOrganizationByIdUseCase
+from app.tasks.organization.get_organization_by_id_task import GetOrganizationByIdTask
 
 
 class CreateRollCallUseCase:
     def __init__(self,
                  session: Annotated[sessionmaker, Depends(get_session)],
                  get_current_employee_task: Annotated[GetCurrentEmployeeTask, Depends(GetCurrentEmployeeTask)],
-                 get_organization_by_id_use_case: Annotated[GetOrganizationByIdUseCase, Depends(GetOrganizationByIdUseCase)]
+                 get_organization_by_id_task: Annotated[GetOrganizationByIdTask, Depends(GetOrganizationByIdTask)]
     ):
         self.session = session
         self.get_current_employee_task = get_current_employee_task
-        self.get_organization_by_id_use_case = get_organization_by_id_use_case
+        self.get_organization_by_id_use_case = get_organization_by_id_task
 
     def execute(self, data: RollCallViewModel, user: User) -> RollCall:
         employee = self.get_current_employee_task.run(user)
-        organization = self.get_organization_by_id_use_case.execute(employee.organization_id)
+        organization = self.get_organization_by_id_use_case.run(employee.organization_id)
 
         roll_call = RollCall(
             department_id=employee.department_id,

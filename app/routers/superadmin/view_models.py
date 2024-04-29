@@ -87,12 +87,18 @@ class EmployeeResponse(BaseModel):
         return response
 
 
+class OrganizationSettingsViewModel(BaseModel):
+    roll_call_start_time: str | None = None
+    roll_call_end_time: str | None = None
+
+
 class OrganizationResponse(CreateOrganizationViewModel):
     id: int
     created_at: datetime
     updated_at: datetime
 
     departments: List[DepartmentResponse] | None = None
+    settings: OrganizationSettingsViewModel | None = None
 
     @staticmethod
     def from_model(model: Organization):
@@ -114,5 +120,10 @@ class OrganizationResponse(CreateOrganizationViewModel):
                         name=department.name
                     ), model.departments
                 )
+            )
+        if 'settings' in model.__dict__:
+            response.settings = OrganizationSettingsResponse(
+                roll_call_start_time=model.settings.roll_call_start_time,
+                roll_call_end_time=model.settings.roll_call_end_time
             )
         return response

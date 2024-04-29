@@ -16,6 +16,7 @@ class GetOrganizationByIdUseCase:
     def execute(self, organization_id: int) -> Organization:
         with self.session() as session:
             organization = session.query(Organization).options(
-                joinedload(Organization.departments)
+                joinedload(Organization.departments),
+                joinedload(Organization.settings)
             ).get(organization_id)
         return organization

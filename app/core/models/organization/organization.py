@@ -5,6 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .. import Base
 from app.core.models import TimestampMixin
+from .organization_settings import OrganizationSettings
 
 
 class Organization(Base, TimestampMixin):
@@ -19,3 +20,4 @@ class Organization(Base, TimestampMixin):
 
     departments: Mapped[List["Department"]] = relationship(back_populates='organization')
     employees: Mapped[List["Employee"]] = relationship(back_populates='organization')
+    settings: Mapped[OrganizationSettings] = relationship(uselist=False)

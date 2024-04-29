@@ -3,3 +3,4 @@ from .get_organizations_use_case import GetOrganizationsCase
 from .get_organization_by_id_use_case import GetOrganizationByIdUseCase
 from .update_organization_use_case import UpdateOrganizationUseCase
 from .delete_organization_use_case import DeleteOrganizationUseCase
+from .update_organization_settings_use_case import UpdateOrganizationSettingsUseCase

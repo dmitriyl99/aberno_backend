@@ -14,23 +14,23 @@ class GetRollCallHistoryUseCase:
     def __init__(self,
                  session: Annotated[sessionmaker, Depends(get_session)],
                  get_current_employee_task: Annotated[GetCurrentEmployeeTask, Depends(GetCurrentEmployeeTask)]
-    ):
+                 ):
         self.session = session
         self.get_current_employee_task = get_current_employee_task
 
-    def execute(self, user: User, date_from: date | None, date_to: date | None) -> List[Type[RollCall]]:
+    def execute(self, user: User | None, date_from: date | None, date_to: date | None) -> List[Type[RollCall]]:
         employee = self.get_current_employee_task.run(user)
-
         with self.session() as session:
             query = session.query(RollCall).options(
                 joinedload(RollCall.sick_leave)
             ).filter(
-                RollCall.employee_id == employee.id
-            ).filter(
                 RollCall.organization_id == employee.organization_id
-            ).filter(
-                RollCall.department_id == employee.department_id
             ).order_by(RollCall.created_at.desc())
+
+            if user:
+                query = query.filter(
+                    RollCall.employee_id == employee.id
+                )
 
             if date_from:
                 query = query.filter(RollCall.created_at >= date_from)

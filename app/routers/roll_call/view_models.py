@@ -3,6 +3,8 @@ from enum import Enum
 
 from datetime import datetime, date
 
+from app.core.models.roll_call.roll_call import RollCall
+
 
 class RollCallStatusEnum(str, Enum):
     ON_WORK = 'ON_WORK'
@@ -44,5 +46,18 @@ class RollCallResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-
-
+    @staticmethod
+    def from_model(roll_call: RollCall):
+        return RollCallResponse(
+            id=roll_call.id,
+            status=roll_call.status,
+            note=roll_call.note,
+            created_at=roll_call.created_at,
+            updated_at=roll_call.updated_at,
+            sick_leave=RollCallSickLeaveResponse(
+                id=roll_call.sick_leave.id,
+                date_from=roll_call.sick_leave.date_from,
+                date_to=roll_call.sick_leave.date_to,
+                note=roll_call.sick_leave.note
+            ) if roll_call.sick_leave else None
+        )

@@ -22,13 +22,7 @@ async def create_roll_call(
     user = Auth.get_current_user()
     roll_call = create_roll_call_use_case.execute(roll_call, user)
 
-    return RollCallResponse(
-        id=roll_call.id,
-        status=roll_call.status,
-        note=roll_call.note,
-        created_at=roll_call.created_at,
-        updated_at=roll_call.updated_at
-    )
+    return RollCallResponse.from_model(roll_call)
 
 
 @router.get("/history/", status_code=status.HTTP_200_OK, response_model=List[RollCallResponse])
@@ -40,19 +34,7 @@ async def get_roll_call_history(
     user = Auth.get_current_user()
     roll_call_history = get_roll_call_history_use_case.execute(user, date_from, date_to)
 
-    return list(map(lambda roll_call: RollCallResponse(
-        id=roll_call.id,
-        status=roll_call.status,
-        note=roll_call.note,
-        created_at=roll_call.created_at,
-        updated_at=roll_call.updated_at,
-        sick_leave=RollCallSickLeaveResponse(
-            id=roll_call.sick_leave.id,
-            date_from=roll_call.sick_leave.date_from,
-            date_to=roll_call.sick_leave.date_to,
-            note=roll_call.sick_leave.note
-        ) if roll_call.sick_leave else None
-    ), roll_call_history))
+    return list(map(lambda roll_call: RollCallResponse.from_model(roll_call), roll_call_history))
 
 
 @router.get("/calendar/status/", status_code=status.HTTP_200_OK)

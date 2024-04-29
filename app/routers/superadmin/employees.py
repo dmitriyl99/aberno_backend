@@ -9,7 +9,9 @@ from app.core.facades.auth import Auth
 
 
 from .view_models import CreateEmployeeViewModel, EmployeeResponse
+from ..roll_call.view_models import RollCallResponse, RollCallSickLeaveResponse
 from ...core.models.organization import Employee
+from ...use_cases.roll_call.get_roll_call_history_user_case import GetRollCallHistoryUseCase
 
 router = APIRouter(prefix='/employees', tags=['admin-employees'])
 
@@ -37,6 +39,21 @@ async def get_employee_by_id(
         raise HTTPException(status_code=404, detail="Employee not found")
 
     return EmployeeResponse.from_model(employee)
+
+
+@router.get("/{employee_id}/roll-call-history")
+async def get_employee_roll_call_history(
+        get_employee_by_id_use_case: Annotated[GetEmployeeByIdUseCase, Depends(GetEmployeeByIdUseCase)],
+        get_roll_call_history_use_case: Annotated[GetRollCallHistoryUseCase, Depends(GetRollCallHistoryUseCase)],
+        employee_id: int
+):
+    employee = get_employee_by_id_use_case.execute(Auth.get_current_user(), employee_id)
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    roll_call_history = get_roll_call_history_use_case.execute(employee.user, None, None)
+
+    return list(map(lambda roll_call: RollCallResponse.from_model(roll_call), roll_call_history))
+
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=EmployeeResponse)

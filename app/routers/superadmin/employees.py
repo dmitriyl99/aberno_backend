@@ -1,15 +1,15 @@
+from datetime import date, timedelta
 from typing import Annotated, List
+import calendar
 
 from fastapi import APIRouter, Depends, status, HTTPException
-
 
 from app.use_cases.organization.employee import (
     GetEmployeesUseCase, GetEmployeeByIdUseCase, UpdateEmployeeUseCase, DeleteEmployeeUseCase, CreateEmployeeUseCase)
 from app.core.facades.auth import Auth
 
-
 from .view_models import CreateEmployeeViewModel, EmployeeResponse
-from ..roll_call.view_models import RollCallResponse, RollCallSickLeaveResponse
+from ..roll_call.view_models import RollCallResponse, RollCallSickLeaveResponse, RollCallStatusEnum
 from ...core.models.organization import Employee
 from ...use_cases.roll_call.get_roll_call_history_user_case import GetRollCallHistoryUseCase
 
@@ -45,14 +45,43 @@ async def get_employee_by_id(
 async def get_employee_roll_call_history(
         get_employee_by_id_use_case: Annotated[GetEmployeeByIdUseCase, Depends(GetEmployeeByIdUseCase)],
         get_roll_call_history_use_case: Annotated[GetRollCallHistoryUseCase, Depends(GetRollCallHistoryUseCase)],
-        employee_id: int
+        employee_id: int,
+        filter_date: date | None = None,
 ):
+    if not filter_date:
+        filter_date = date.today()
     employee = get_employee_by_id_use_case.execute(Auth.get_current_user(), employee_id)
     if not employee:
         raise HTTPException(status_code=404, detail="Employee not found")
     roll_call_history = get_roll_call_history_use_case.execute(employee.user, None, None)
 
-    return list(map(lambda roll_call: RollCallResponse.from_model(roll_call), roll_call_history))
+    start_date = filter_date.replace(day=1)
+    end_date = filter_date.replace(day=calendar.monthrange(filter_date.year, filter_date.month)[1])
+    result = {}
+    current_date = start_date
+    while current_date <= end_date:
+        filtered_roll_calls = list(
+            filter(
+                lambda r: r.created_at.date() == current_date, roll_call_history
+            ))
+        date_roll_call = None
+        if len(filtered_roll_calls) > 0:
+            date_roll_call = filtered_roll_calls[0]
+        result[current_date.strftime('%Y-%m-%d')] = date_roll_call.status if date_roll_call else None
+        current_date += timedelta(days=1)
+
+    sickness_roll_calls = filter(
+        lambda r: r.status == RollCallStatusEnum.SICK, roll_call_history
+    )
+    for roll_call in sickness_roll_calls:
+        current_date = roll_call.sick_leave.date_from
+        while current_date <= roll_call.sick_leave.date_to:
+            current_date_str = current_date.strftime('%Y-%m-%d')
+            if current_date_str in result and not result[current_date_str]:
+                result[current_date_str] = 'SICK'
+            current_date += timedelta(days=1)
+
+    return result
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=EmployeeResponse)

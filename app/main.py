@@ -1,12 +1,24 @@
 from fastapi import FastAPI
 
+from contextlib import asynccontextmanager
+
 from app.routers.auth import authentication
 from app.routers import organization, roll_call, superadmin
+from app import schedule
 
 from app.settings import settings
 
 
-app = FastAPI(debug=settings.environment in ['local', 'debug'], title="Aberno API")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    schedule.start()
+
+    yield
+
+    schedule.stop()
+
+
+app = FastAPI(debug=settings.environment in ['local', 'debug'], title="Aberno API", lifespan=lifespan)
 
 app.include_router(router=authentication.router, prefix='/api/auth')
 for router in organization.routers:

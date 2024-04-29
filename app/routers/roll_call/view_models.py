@@ -11,6 +11,7 @@ class RollCallStatusEnum(str, Enum):
     OFF_DAY = 'OFF_DAY'
     LATE = 'LATE',
     SICK = 'SICK'
+    ABSENT = 'ABSENT'
     REASONED = 'REASONED'
 
 

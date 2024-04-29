@@ -55,7 +55,6 @@ async def get_employee_roll_call_history(
     return list(map(lambda roll_call: RollCallResponse.from_model(roll_call), roll_call_history))
 
 
-
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=EmployeeResponse)
 async def create_employee(
         data: CreateEmployeeViewModel,

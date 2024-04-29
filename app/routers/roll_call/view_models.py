@@ -9,6 +9,7 @@ from app.core.models.roll_call.roll_call import RollCall
 class RollCallStatusEnum(str, Enum):
     ON_WORK = 'ON_WORK'
     OFF_DAY = 'OFF_DAY'
+    LATE = 'LATE',
     SICK = 'SICK'
     REASONED = 'REASONED'
 

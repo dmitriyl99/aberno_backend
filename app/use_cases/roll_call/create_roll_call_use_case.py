@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker
 import geopy.distance
 from starlette import status
 
-from datetime import date
+from datetime import date, datetime
 
 from app.core.models.roll_call.sick_leave import SickLeave
 from app.dal import get_session
@@ -13,18 +13,22 @@ from app.routers.roll_call.view_models import RollCallViewModel, RollCallStatusE
 from app.core.models.roll_call.roll_call import RollCall, Location
 from app.core.models.auth import User
 from app.tasks.organization.get_current_employee_task import GetCurrentEmployeeTask
+from app.use_cases.organization import GetOrganizationByIdUseCase
 
 
 class CreateRollCallUseCase:
     def __init__(self,
                  session: Annotated[sessionmaker, Depends(get_session)],
-                 get_current_employee_task: Annotated[GetCurrentEmployeeTask, Depends(GetCurrentEmployeeTask)]
+                 get_current_employee_task: Annotated[GetCurrentEmployeeTask, Depends(GetCurrentEmployeeTask)],
+                 get_organization_by_id_use_case: Annotated[GetOrganizationByIdUseCase, Depends(GetOrganizationByIdUseCase)]
     ):
         self.session = session
         self.get_current_employee_task = get_current_employee_task
+        self.get_organization_by_id_use_case = get_organization_by_id_use_case
 
     def execute(self, data: RollCallViewModel, user: User) -> RollCall:
         employee = self.get_current_employee_task.run(user)
+        organization = self.get_organization_by_id_use_case.execute(employee.organization_id)
 
         roll_call = RollCall(
             department_id=employee.department_id,
@@ -55,6 +59,19 @@ class CreateRollCallUseCase:
                         status_code=status.HTTP_400_BAD_REQUEST,
                         detail='You are not on the territory of the organization'
                     )
+            if organization.settings and organization.settings.roll_call_end_time:
+                now = datetime.now()
+                roll_call_start_time_parsed = organization.settings.roll_call_end_time.split(':')
+                roll_call_end_time = datetime(
+                    now.year,
+                    now.month,
+                    now.day,
+                    int(roll_call_start_time_parsed[0]),
+                    int(roll_call_start_time_parsed[1])
+                )
+                if now > roll_call_end_time:
+                    data.status = RollCallStatusEnum.LATE
+
         elif data.status == RollCallStatusEnum.OFF_DAY:
             today = date.today()
             if today.isoweekday() not in (6, 7): # Saturday and Sunday

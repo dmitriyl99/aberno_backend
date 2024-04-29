@@ -50,16 +50,19 @@ class RollCallResponse(BaseModel):
 
     @staticmethod
     def from_model(roll_call: RollCall):
-        return RollCallResponse(
+        response = RollCallResponse(
             id=roll_call.id,
             status=roll_call.status,
             note=roll_call.note,
             created_at=roll_call.created_at,
-            updated_at=roll_call.updated_at,
-            sick_leave=RollCallSickLeaveResponse(
+            updated_at=roll_call.updated_at
+        )
+        if 'sick_leave' in roll_call.__dict__:
+            response.sick_leave = RollCallSickLeaveResponse(
                 id=roll_call.sick_leave.id,
                 date_from=roll_call.sick_leave.date_from,
                 date_to=roll_call.sick_leave.date_to,
                 note=roll_call.sick_leave.note
             ) if roll_call.sick_leave else None
-        )
+
+        return response

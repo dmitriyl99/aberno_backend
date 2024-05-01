@@ -15,7 +15,7 @@ from ..roll_call.roll_call import RollCall
 class Employee(Base, TimestampMixin):
     __tablename__ = "employees"
     id: Mapped[int] = mapped_column(primary_key=True)
-    birth_date: Mapped[date] = mapped_column(Date)
+    position: Mapped[str] = mapped_column(String(200))
     phone: Mapped[str] = mapped_column(String(12))
 
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))

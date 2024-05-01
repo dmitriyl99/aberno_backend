@@ -37,6 +37,7 @@ async def get_me(
     return CurrentUserViewModel(
         id=current_user.id,
         name=current_user.name,
+        last_name=current_user.last_name,
         username=current_user.username,
         created_at=current_user.created_at,
         updated_at=current_user.updated_at,

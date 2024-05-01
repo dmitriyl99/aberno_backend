@@ -29,6 +29,7 @@ class CreateEmployeeUseCase:
 
         user = User(
             name=data.name,
+            last_name=data.last_name,
             username=data.username,
             password=self.pwd_context.hash(data.password)
         )
@@ -51,8 +52,8 @@ class CreateEmployeeUseCase:
             session.commit()
             session.refresh(user)
             employee = Employee(
-                birth_date=data.birth_date,
                 phone=data.phone,
+                position=data.position,
                 user_id=user.id,
                 department_id=data.department_id,
                 organization_id=current_employee.organization_id,

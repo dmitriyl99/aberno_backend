@@ -15,6 +15,7 @@ class User(Base, TimestampMixin):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(200))
+    last_name: Mapped[str] = mapped_column(String(200))
     username: Mapped[str] = mapped_column(String(100))
     password: Mapped[str] = mapped_column(Text)
 

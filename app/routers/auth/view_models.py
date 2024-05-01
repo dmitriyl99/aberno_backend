@@ -26,6 +26,7 @@ class PermissionViewModel(BaseModel):
 class CurrentUserViewModel(BaseModel):
     id: int
     name: str
+    last_name: str | None
     username: str
     created_at: datetime
     updated_at: datetime

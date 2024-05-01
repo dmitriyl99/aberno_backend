@@ -22,11 +22,12 @@ class CreateDepartmentViewModel(BaseModel):
 
 class CreateEmployeeViewModel(BaseModel):
     name: str
+    last_name: str
     username: str
     password: str | None = None
     password_confirmation: str | None = None
 
-    birth_date: date
+    position: str
     phone: str
     department_id: int
 
@@ -56,9 +57,9 @@ class DepartmentResponse(BaseModel):
 class EmployeeResponse(BaseModel):
     id: int
     phone: str
-    birth_date: date
     user: CurrentUserViewModel | None = None
     department: DepartmentResponse | None = None
+    position: str | None = None
 
     created_at: datetime
     updated_at: datetime
@@ -68,7 +69,7 @@ class EmployeeResponse(BaseModel):
         response = EmployeeResponse(
             id=model.id,
             phone=model.phone,
-            birth_date=model.birth_date,
+            position=model.position,
             created_at=model.created_at,
             updated_at=model.updated_at
         )
@@ -78,6 +79,7 @@ class EmployeeResponse(BaseModel):
             response.user = CurrentUserViewModel(
                 id=model.user.id,
                 name=model.user.name,
+                last_name=model.user.last_name,
                 username=model.user.username,
                 created_at=model.user.created_at,
                 updated_at=model.user.updated_at,

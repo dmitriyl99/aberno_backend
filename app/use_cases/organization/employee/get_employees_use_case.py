@@ -22,7 +22,9 @@ class GetEmployeesUseCase:
         current_employee = self.get_current_employee_task.run(user)
         with self.session() as session:
             query = session.query(Employee).options(
-                joinedload(Employee.user), joinedload(Employee.department)
+                joinedload(Employee.user),
+                joinedload(Employee.department),
+                joinedload(Employee.created_by)
             ).filter(
                 Employee.organization_id == current_employee.organization_id
             )

@@ -23,7 +23,8 @@ class GetEmployeeByIdUseCase:
         with self.session() as session:
             organization = session.query(Employee).options(
                 joinedload(Employee.department),
-                joinedload(Employee.user)
+                joinedload(Employee.user),
+                joinedload(Employee.created_by)
             ).filter(and_(
                 Employee.organization_id == current_employee.organization_id,
                 Employee.id == employee_id

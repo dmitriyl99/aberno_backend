@@ -20,12 +20,12 @@ class CreateEmployeeUseCase:
         self.pwd_context = CryptContext(schemes=['bcrypt'], deprecated="auto")
         self.get_current_employee_task = get_current_employee_task
 
-    def execute(self, user: User, data: CreateEmployeeViewModel) -> Employee:
+    def execute(self, current_user: User, data: CreateEmployeeViewModel) -> Employee:
         if data.password is None or data.password_confirmation is None:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Password is required")
         if data.password != data.password_confirmation:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Password does not match")
-        current_employee = self.get_current_employee_task.run(user)
+        current_employee = self.get_current_employee_task.run(current_user)
 
         user = User(
             name=data.name,
@@ -57,6 +57,7 @@ class CreateEmployeeUseCase:
                 user_id=user.id,
                 department_id=data.department_id,
                 organization_id=current_employee.organization_id,
+                created_by_id=current_user.id
             )
             session.add(employee)
             session.commit()

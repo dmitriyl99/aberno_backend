@@ -54,12 +54,19 @@ class DepartmentResponse(BaseModel):
         return response
 
 
+class CreatedByViewModel(BaseModel):
+    id: int
+    name: str
+    last_name: str | None
+
+
 class EmployeeResponse(BaseModel):
     id: int
     phone: str
     user: CurrentUserViewModel | None = None
     department: DepartmentResponse | None = None
     position: str | None = None
+    created_by: CurrentUserViewModel | None = None
 
     created_at: datetime
     updated_at: datetime
@@ -76,7 +83,7 @@ class EmployeeResponse(BaseModel):
         if 'department' in model.__dict__:
             response.department = DepartmentResponse.from_model(model.department)
         if 'user' in model.__dict__:
-            response.user = CurrentUserViewModel(
+            response.user = CreatedByViewModel(
                 id=model.user.id,
                 name=model.user.name,
                 last_name=model.user.last_name,
@@ -85,6 +92,12 @@ class EmployeeResponse(BaseModel):
                 updated_at=model.user.updated_at,
                 roles=None,
                 permissions=None,
+            )
+        if 'created_by' in model.__dict__ and model.created_by is not None:
+            response.created_by = CreatedByViewModel(
+                id=model.created_by.id,
+                name=model.created_by.name,
+                last_name=model.created_by.last_name
             )
         return response
 

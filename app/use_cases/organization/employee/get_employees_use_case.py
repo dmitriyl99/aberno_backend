@@ -1,7 +1,7 @@
 from typing import Annotated, List, Type
 
 from sqlalchemy import or_
-from sqlalchemy.orm import sessionmaker, joinedload
+from sqlalchemy.orm import sessionmaker, joinedload, contains_eager
 from fastapi import Depends, HTTPException
 from starlette import status
 
@@ -35,8 +35,8 @@ class GetEmployeesUseCase:
 
         current_employee = self.get_current_employee_task.run(user)
         with self.session() as session:
-            query = session.query(Employee).options(
-                joinedload(Employee.user),
+            query = session.query(Employee).populate_existing().options(
+                joinedload(Employee.user).joinedload(User.roles),
                 joinedload(Employee.department),
                 joinedload(Employee.created_by)
             ).filter(

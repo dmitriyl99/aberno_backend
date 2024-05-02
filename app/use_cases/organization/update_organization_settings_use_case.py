@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from app.core.models.auth import User
 from app.core.models.organization.organization_settings import OrganizationSettings
 from app.dal import get_session
-from app.routers.superadmin.view_models import OrganizationSettingsViewModel
+from app.routers.admin.view_models import OrganizationSettingsViewModel
 from app.tasks.organization.get_current_employee_task import GetCurrentEmployeeTask
 
 

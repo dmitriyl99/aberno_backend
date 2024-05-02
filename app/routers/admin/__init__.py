@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 
 from app.dependencies import verify_authenticated_user, verify_admin_user
 
-from app.routers.superadmin import organizations, departments, employees
+from app.routers.admin import organizations, departments, employees
 
 
 router = APIRouter(

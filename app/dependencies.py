@@ -42,18 +42,24 @@ async def verify_authenticated_user(
     await Auth.authorize_user(token, 'jwt', get_user_by_id_task)
 
 
-async def verify_admin_user(
-        get_user_by_id_task: Annotated[GetUserByIdTask, Depends(GetUserByIdTask)]
-):
-    user = Auth.get_current_user()
-    error = HTTPException(
-        status_code=status.HTTP_403_FORBIDDEN, detail="Could not authorize admin user"
+async def _verify_user_roles(user: User, roles: list) -> bool:
+    role_filter = filter(
+        lambda r: r.name in roles, user.roles
     )
-    if not user:
-        raise error
-    admin_role_filter = filter(
-        lambda role: role.name == 'Admin', user.roles
-    )
+    return len(list(role_filter)) > 0
 
-    if len(list(admin_role_filter)) == 0:
-        raise error
+
+async def verify_admin_user():
+    user = Auth.get_current_user()
+    if not _verify_user_roles(user, ['Admin', 'Super Admin']):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Could not authorize admin user"
+        )
+
+
+async def verify_super_admin_user():
+    user = Auth.get_current_user()
+    if not _verify_user_roles(user, ['Super Admin']):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Could not authorize admin user"
+        )

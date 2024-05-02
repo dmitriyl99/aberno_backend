@@ -31,6 +31,12 @@ class CreateEmployeeViewModel(BaseModel):
     phone: str
     department_id: int
 
+    role_id: int | None = None
+
+
+class ChangeRoleViewModel(BaseModel):
+    role_id: int
+
 
 class DepartmentResponse(BaseModel):
     id: int
@@ -83,7 +89,7 @@ class EmployeeResponse(BaseModel):
         if 'department' in model.__dict__:
             response.department = DepartmentResponse.from_model(model.department)
         if 'user' in model.__dict__:
-            response.user = CreatedByViewModel(
+            response.user = CurrentUserViewModel(
                 id=model.user.id,
                 name=model.user.name,
                 last_name=model.user.last_name,

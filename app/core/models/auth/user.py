@@ -21,3 +21,23 @@ class User(Base, TimestampMixin):
 
     roles: Mapped[List[Role]] = relationship(secondary=roles_users)
     permissions: Mapped[List[Permission]] = relationship(secondary=permissions_users)
+
+    @property
+    def is_admin(self) -> bool:
+        return len(
+            list(
+                filter(
+                    lambda r: r.name == 'Admin', self.roles
+                )
+            )
+        ) > 0
+
+    @property
+    def is_super_admin(self) -> bool:
+        return len(
+            list(
+                filter(
+                    lambda r: r.name == 'Super Admin', self.roles
+                )
+            )
+        ) > 0

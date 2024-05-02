@@ -5,9 +5,9 @@ from fastapi import Depends, HTTPException, status
 from passlib.context import CryptContext
 
 from app.dal import get_session
-from app.core.models.auth import User
+from app.core.models.auth import User, Role
 from app.core.models.organization import Employee
-from app.routers.superadmin.view_models import CreateEmployeeViewModel
+from app.routers.admin.view_models import CreateEmployeeViewModel
 from app.tasks.organization.get_current_employee_task import GetCurrentEmployeeTask
 
 
@@ -25,6 +25,12 @@ class CreateEmployeeUseCase:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Password is required")
         if data.password != data.password_confirmation:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Password does not match")
+        if data.role_id:
+            if not current_user.is_super_admin:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail='You do not have permission to perform this action'
+                )
         current_employee = self.get_current_employee_task.run(current_user)
 
         user = User(
@@ -47,8 +53,10 @@ class CreateEmployeeUseCase:
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail='Phone number is already taken'
                 )
-
             session.add(user)
+            if data.role_id:
+                role: Role = session.query(Role).get(data.role_id)
+                user.roles.append(role)
             session.commit()
             session.refresh(user)
             employee = Employee(

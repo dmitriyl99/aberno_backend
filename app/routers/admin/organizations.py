@@ -8,11 +8,18 @@ from app.use_cases.organization import (CreateOrganizationUseCase, GetOrganizati
 from .view_models import CreateOrganizationViewModel, OrganizationResponse, OrganizationSettingsViewModel
 from app.core.facades.auth import Auth
 from ...tasks.organization.get_current_employee_task import GetCurrentEmployeeTask
+from app.dependencies import verify_super_admin_user
 
-router = APIRouter(prefix='/organizations', tags=['admin-organizations'])
+router = APIRouter(
+    prefix='/organizations',
+    tags=['admin-organizations'],
+)
 
 
-@router.get('/', status_code=status.HTTP_200_OK, response_model=List[OrganizationResponse])
+@router.get('/',
+            status_code=status.HTTP_200_OK,
+            response_model=List[OrganizationResponse],
+            dependencies=[Depends(verify_super_admin_user)])
 async def get_organizations(
         get_organizations_use_case: Annotated[GetOrganizationsCase, Depends(GetOrganizationsCase)],
         search: str | None = None,
@@ -60,7 +67,9 @@ async def update_organization_settings(
     )
 
 
-@router.get('/{organization_id}', response_model=OrganizationResponse)
+@router.get('/{organization_id}',
+            response_model=OrganizationResponse,
+            dependencies=[Depends(verify_super_admin_user)])
 async def get_organization(
         organization_id: int,
         get_organization_by_id_use_case: Annotated[GetOrganizationByIdUseCase, Depends(GetOrganizationByIdUseCase)]
@@ -75,7 +84,10 @@ async def get_organization(
     return OrganizationResponse.from_model(organization)
 
 
-@router.post('/', status_code=status.HTTP_201_CREATED, response_model=OrganizationResponse)
+@router.post('/',
+             status_code=status.HTTP_201_CREATED,
+             response_model=OrganizationResponse,
+             dependencies=[Depends(verify_super_admin_user)])
 async def create_organization(
         organization: CreateOrganizationViewModel,
         create_organization_use_case: Annotated[CreateOrganizationUseCase, Depends(CreateOrganizationUseCase)]
@@ -85,7 +97,10 @@ async def create_organization(
     return OrganizationResponse.from_model(organization)
 
 
-@router.put('/{organization_id}', status_code=status.HTTP_200_OK, response_model=OrganizationResponse)
+@router.put('/{organization_id}',
+            status_code=status.HTTP_200_OK,
+            response_model=OrganizationResponse,
+            dependencies=[Depends(verify_super_admin_user)])
 async def update_organization(
         organization: CreateOrganizationViewModel,
         organization_id: int,
@@ -101,7 +116,9 @@ async def update_organization(
     return OrganizationResponse.from_model(organization)
 
 
-@router.delete('/{organization_id}', status_code=status.HTTP_204_NO_CONTENT)
+@router.delete('/{organization_id}',
+               status_code=status.HTTP_204_NO_CONTENT,
+               dependencies=[Depends(verify_super_admin_user)])
 async def delete_organization(
         organization_id: int,
         delete_organization_use_case: Annotated[DeleteOrganizationUseCase, Depends(DeleteOrganizationUseCase)]

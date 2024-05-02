@@ -1,5 +1,5 @@
 from datetime import date, timedelta
-from typing import Annotated, List
+from typing import Annotated
 import calendar
 
 from fastapi import APIRouter, Depends, status, HTTPException
@@ -8,9 +8,9 @@ from app.use_cases.organization.employee import (
     GetEmployeesUseCase, GetEmployeeByIdUseCase, UpdateEmployeeUseCase, DeleteEmployeeUseCase, CreateEmployeeUseCase)
 from app.core.facades.auth import Auth
 
-from .view_models import CreateEmployeeViewModel, EmployeeResponse
-from ..roll_call.view_models import RollCallResponse, RollCallSickLeaveResponse, RollCallStatusEnum
-from ...core.models.organization import Employee
+from .view_models import CreateEmployeeViewModel, EmployeeResponse, ChangeRoleViewModel
+from ..roll_call.view_models import RollCallStatusEnum
+from ...use_cases.organization.employee.change_employee_role_use_case import ChangeEmployeeRoleUseCase
 from ...use_cases.roll_call.get_roll_call_history_user_case import GetRollCallHistoryUseCase
 
 router = APIRouter(prefix='/employees', tags=['admin-employees'])
@@ -39,6 +39,15 @@ async def get_employee_by_id(
         raise HTTPException(status_code=404, detail="Employee not found")
 
     return EmployeeResponse.from_model(employee)
+
+
+@router.post("/{employee_id}/role", status_code=status.HTTP_204_NO_CONTENT)
+async def change_role(
+        change_employee_role_use_case: Annotated[ChangeEmployeeRoleUseCase, Depends(ChangeEmployeeRoleUseCase)],
+        employee_id: int,
+        data: ChangeRoleViewModel
+):
+    change_employee_role_use_case.execute(employee_id, data.role_id)
 
 
 @router.get("/{employee_id}/roll-call-history")

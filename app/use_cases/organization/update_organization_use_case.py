@@ -5,7 +5,7 @@ from fastapi import Depends
 
 from app.dal import get_session
 from app.core.models.organization import Organization
-from app.routers.superadmin.view_models import CreateOrganizationViewModel
+from app.routers.admin.view_models import CreateOrganizationViewModel
 
 
 class UpdateOrganizationUseCase:

@@ -7,7 +7,6 @@ from app.use_cases.organization.department import (CreateDepartmentUseCase, GetD
                                                    DeleteDepartmentUseCase)
 from .view_models import CreateDepartmentViewModel, DepartmentResponse
 
-
 router = APIRouter(prefix="/departments", tags=['admin-departments'])
 
 

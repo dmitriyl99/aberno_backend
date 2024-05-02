@@ -8,7 +8,7 @@ from passlib.context import CryptContext
 from app.core.models.auth import User
 from app.dal import get_session
 from app.core.models.organization import Employee
-from app.routers.superadmin.view_models import CreateEmployeeViewModel
+from app.routers.admin.view_models import CreateEmployeeViewModel
 from app.tasks.organization.get_current_employee_task import GetCurrentEmployeeTask
 
 

@@ -2,7 +2,8 @@ from typing import Annotated, List, Type
 
 from sqlalchemy import or_
 from sqlalchemy.orm import sessionmaker, joinedload
-from fastapi import Depends
+from fastapi import Depends, HTTPException
+from starlette import status
 
 from app.core.models.auth import User
 from app.dal import get_session
@@ -18,7 +19,20 @@ class GetEmployeesUseCase:
         self.session = session
         self.get_current_employee_task = get_current_employee_task
 
-    def execute(self, user: User, search: str | None = None, department_id: int | None = None) -> List[Type[Employee]]:
+    def execute(
+            self,
+            user: User,
+            search: str | None = None,
+            department_id: int | None = None,
+            page: int = 1,
+            per_page: int = 10
+    ) -> List[Type[Employee]]:
+        if page <= 0 or per_page <= 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='Wrong pagination settings'
+            )
+
         current_employee = self.get_current_employee_task.run(user)
         with self.session() as session:
             query = session.query(Employee).options(
@@ -35,4 +49,5 @@ class GetEmployeesUseCase:
                 ))
             if department_id is not None:
                 query = query.filter(Employee.department_id == department_id)
+            query = query.limit(per_page).offset((page - 1) * per_page)
             return query.order_by(Employee.created_at.desc()).all()

@@ -29,8 +29,10 @@ async def get_employees(
         get_employees_use_case: Annotated[GetEmployeesUseCase, Depends(GetEmployeesUseCase)],
         search: str | None = None,
         department_id: int | None = None,
+        page: int = 1,
+        per_page: int = 10
 ):
-    employees = get_employees_use_case.execute(Auth.get_current_user(), search, department_id)
+    employees = get_employees_use_case.execute(Auth.get_current_user(), search, department_id, page, per_page)
 
     return list(
         map(lambda employee: EmployeeResponse.from_model(employee), employees)

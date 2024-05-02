@@ -33,8 +33,8 @@ class CurrentUserViewModel(BaseModel):
     created_at: datetime
     updated_at: datetime
     is_active: bool
-    roles: List[RoleViewModel] | None
-    permissions: List[PermissionViewModel] | None
+    roles: List[RoleViewModel] | None = None
+    permissions: List[PermissionViewModel] | None = None
 
     @staticmethod
     def from_model(user: User):

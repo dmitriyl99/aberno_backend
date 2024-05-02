@@ -49,5 +49,4 @@ class GetEmployeesUseCase:
                 ))
             if department_id is not None:
                 query = query.filter(Employee.department_id == department_id)
-            query = query.limit(per_page).offset((page - 1) * per_page)
-            return query.order_by(Employee.created_at.desc()).all()
+            return query.order_by(Employee.created_at.desc()).limit(per_page).offset((page - 1) * per_page).all()

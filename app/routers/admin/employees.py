@@ -7,7 +7,13 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from app.use_cases.organization.employee import (
     GetEmployeesUseCase,
     GetEmployeeByIdUseCase,
-    UpdateEmployeeUseCase, DeleteEmployeeUseCase, CreateEmployeeUseCase, GetRolesUseCase, RemoveEmployeeRoleUseCase)
+    UpdateEmployeeUseCase,
+    DeleteEmployeeUseCase,
+    CreateEmployeeUseCase,
+    GetRolesUseCase,
+    RemoveEmployeeRoleUseCase,
+    ReactivateEmployeeUseCase
+)
 from app.core.facades.auth import Auth
 
 from .view_models import CreateEmployeeViewModel, EmployeeResponse, ChangeRoleViewModel
@@ -132,6 +138,14 @@ async def update_employee(
         raise HTTPException(status_code=404, detail="Employee not found")
 
     return EmployeeResponse.from_model(employee)
+
+
+@router.put("/{employee_id}/reactivate", status_code=status.HTTP_204_NO_CONTENT)
+async def reactivate_employee(
+        employee_id: int,
+        reactivate_employee_use_case: Annotated[ReactivateEmployeeUseCase, Depends(ReactivateEmployeeUseCase)]
+):
+    reactivate_employee_use_case.execute(employee_id)
 
 
 @router.delete("/{employee_id}", status_code=status.HTTP_204_NO_CONTENT)

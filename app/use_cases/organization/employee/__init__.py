@@ -5,3 +5,4 @@ from .get_employee_by_id_use_case import GetEmployeeByIdUseCase
 from .get_employees_use_case import GetEmployeesUseCase
 from .get_roles_use_case import GetRolesUseCase
 from .remove_employee_role_use_case import RemoveEmployeeRoleUseCase
+from .reactivate_employee_use_case import ReactivateEmployeeUseCase

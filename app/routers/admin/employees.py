@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from app.use_cases.organization.employee import (
     GetEmployeesUseCase,
     GetEmployeeByIdUseCase,
-    UpdateEmployeeUseCase, DeleteEmployeeUseCase, CreateEmployeeUseCase, GetRolesUseCase)
+    UpdateEmployeeUseCase, DeleteEmployeeUseCase, CreateEmployeeUseCase, GetRolesUseCase, RemoveEmployeeRoleUseCase)
 from app.core.facades.auth import Auth
 
 from .view_models import CreateEmployeeViewModel, EmployeeResponse, ChangeRoleViewModel
@@ -57,6 +57,15 @@ async def change_role(
         data: ChangeRoleViewModel
 ):
     change_employee_role_use_case.execute(employee_id, data.role_id)
+
+
+@router.delete("/{employee_id}/role", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_role(
+        remove_employee_role_use_case: Annotated[RemoveEmployeeRoleUseCase, Depends(RemoveEmployeeRoleUseCase)],
+        employee_id: int,
+        data: ChangeRoleViewModel
+):
+    remove_employee_role_use_case.execute(employee_id, data.role_id)
 
 
 @router.get("/{employee_id}/roll-call-history")

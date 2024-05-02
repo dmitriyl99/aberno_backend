@@ -1,7 +1,7 @@
 from typing import List
 
 from .. import Base
-from sqlalchemy import String, Text
+from sqlalchemy import String, Text, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .associations import roles_users, permissions_users
 
@@ -18,6 +18,7 @@ class User(Base, TimestampMixin):
     last_name: Mapped[str] = mapped_column(String(200))
     username: Mapped[str] = mapped_column(String(100))
     password: Mapped[str] = mapped_column(Text)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
     roles: Mapped[List[Role]] = relationship(secondary=roles_users)
     permissions: Mapped[List[Permission]] = relationship(secondary=permissions_users)

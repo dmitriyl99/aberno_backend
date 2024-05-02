@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, HTTPException, status
 from fastapi import Depends
 
-from .view_models import Token, LoginForm, CurrentUserViewModel, RoleViewModel, PermissionViewModel
+from .view_models import Token, LoginForm, CurrentUserViewModel
 
 from app.use_cases.auth.create_token_use_case import CreateTokenUseCase
 from app.dependencies import verify_authenticated_user
@@ -34,19 +34,4 @@ async def create_access_token(
 async def get_me(
 ):
     current_user = Auth.get_current_user()
-    return CurrentUserViewModel(
-        id=current_user.id,
-        name=current_user.name,
-        last_name=current_user.last_name,
-        username=current_user.username,
-        created_at=current_user.created_at,
-        updated_at=current_user.updated_at,
-        roles=list(map(lambda x: RoleViewModel(
-            id=x.id,
-            name=x.name
-        ), current_user.roles)),
-        permissions=list(map(lambda x: PermissionViewModel(
-            id=x.id,
-            name=x.name
-        ), current_user.permissions))
-    )
+    return CurrentUserViewModel.from_model(current_user)

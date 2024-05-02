@@ -2,6 +2,8 @@ from typing import List
 from pydantic import BaseModel
 from datetime import datetime
 
+from app.core.models.auth import User
+
 
 class Token(BaseModel):
     access_token: str
@@ -30,6 +32,30 @@ class CurrentUserViewModel(BaseModel):
     username: str
     created_at: datetime
     updated_at: datetime
+    is_active: bool
     roles: List[RoleViewModel] | None
     permissions: List[PermissionViewModel] | None
 
+    @staticmethod
+    def from_model(user: User):
+        response = CurrentUserViewModel(
+            id=user.id,
+            name=user.name,
+            last_name=user.last_name,
+            is_active=user.is_active,
+            username=user.username,
+            created_at=user.created_at,
+            updated_at=user.updated_at,
+        )
+        if 'roles' in user.__dict__:
+            response.roles = list(map(lambda x: RoleViewModel(
+                id=x.id,
+                name=x.name
+            ), user.roles))
+        if 'permissions' in user.__dict__:
+            response.permissions = list(map(lambda x: PermissionViewModel(
+                id=x.id,
+                name=x.name
+            ), user.permissions))
+
+        return response

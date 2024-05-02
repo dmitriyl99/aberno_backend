@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, joinedload
 from fastapi import Depends, HTTPException, status
 
 from app.core.models.auth import User
@@ -20,7 +20,7 @@ class DeleteEmployeeUseCase:
     def execute(self, user: User, employee_id: int) -> bool:
         current_employee = self.get_current_employee_task.run(user)
         with self.session() as session:
-            employee: Employee = session.query(Employee).get(employee_id)
+            employee: Employee = session.query(Employee).options(joinedload(Employee.user)).get(employee_id)
             if not employee:
                 return False
             if employee.organization_id != current_employee.organization_id:
@@ -28,6 +28,6 @@ class DeleteEmployeeUseCase:
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="You do not have permission to delete employees not from your organization"
                 )
-            session.delete(employee)
+            employee.user.is_active = False
             session.commit()
         return True

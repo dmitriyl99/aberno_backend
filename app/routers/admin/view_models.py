@@ -89,16 +89,7 @@ class EmployeeResponse(BaseModel):
         if 'department' in model.__dict__:
             response.department = DepartmentResponse.from_model(model.department)
         if 'user' in model.__dict__:
-            response.user = CurrentUserViewModel(
-                id=model.user.id,
-                name=model.user.name,
-                last_name=model.user.last_name,
-                username=model.user.username,
-                created_at=model.user.created_at,
-                updated_at=model.user.updated_at,
-                roles=None,
-                permissions=None,
-            )
+            response.user = CurrentUserViewModel.from_model(model.user)
         if 'created_by' in model.__dict__ and model.created_by is not None:
             response.created_by = CreatedByViewModel(
                 id=model.created_by.id,

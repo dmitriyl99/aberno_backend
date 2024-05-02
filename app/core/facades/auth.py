@@ -26,6 +26,8 @@ class Auth:
             user = get_user_by_id_task.run(int(user_id))
             if user is None:
                 raise credentials_exception
+            if not user.is_active:
+                raise credentials_exception
             Auth.__current_user = user
         else:
             raise Exception("Invalid token type")

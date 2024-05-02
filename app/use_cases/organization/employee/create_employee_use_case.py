@@ -56,7 +56,10 @@ class CreateEmployeeUseCase:
             session.add(user)
             if data.role_id:
                 role: Role = session.query(Role).get(data.role_id)
-                user.roles.append(role)
+
+            else:
+                role: Role = session.query(Role).get(0)
+            user.roles.append(role)
             session.commit()
             session.refresh(user)
             employee = Employee(

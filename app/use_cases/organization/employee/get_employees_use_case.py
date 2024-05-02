@@ -35,4 +35,4 @@ class GetEmployeesUseCase:
                 ))
             if department_id is not None:
                 query = query.filter(Employee.department_id == department_id)
-            return query.all()
+            return query.order_by(Employee.created_at.desc()).all()

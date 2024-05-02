@@ -1,4 +1,4 @@
-from typing import Annotated, List, Type
+from typing import Annotated, List, Type, Tuple
 
 from sqlalchemy import or_
 from sqlalchemy.orm import sessionmaker, joinedload, contains_eager
@@ -26,7 +26,7 @@ class GetEmployeesUseCase:
             department_id: int | None = None,
             page: int = 1,
             per_page: int = 10
-    ) -> List[Type[Employee]]:
+    ) -> Tuple[List[Type[Employee]], int]:
         if page <= 0 or per_page <= 0:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -49,4 +49,4 @@ class GetEmployeesUseCase:
                 ))
             if department_id is not None:
                 query = query.filter(Employee.department_id == department_id)
-            return query.order_by(Employee.created_at.desc()).limit(per_page).offset((page - 1) * per_page).all()
+            return query.order_by(Employee.created_at.desc()).limit(per_page).offset((page - 1) * per_page).all(), query.count()

@@ -32,11 +32,14 @@ async def get_employees(
         page: int = 1,
         per_page: int = 10
 ):
-    employees = get_employees_use_case.execute(Auth.get_current_user(), search, department_id, page, per_page)
+    employees, count = get_employees_use_case.execute(Auth.get_current_user(), search, department_id, page, per_page)
 
-    return list(
-        map(lambda employee: EmployeeResponse.from_model(employee), employees)
-    )
+    return {
+        'count': count,
+        'data': list(
+            map(lambda employee: EmployeeResponse.from_model(employee), employees)
+        )
+    }
 
 
 @router.get('/roles', status_code=status.HTTP_200_OK)

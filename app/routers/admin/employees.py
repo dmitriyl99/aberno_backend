@@ -5,7 +5,9 @@ import calendar
 from fastapi import APIRouter, Depends, status, HTTPException
 
 from app.use_cases.organization.employee import (
-    GetEmployeesUseCase, GetEmployeeByIdUseCase, UpdateEmployeeUseCase, DeleteEmployeeUseCase, CreateEmployeeUseCase)
+    GetEmployeesUseCase,
+    GetEmployeeByIdUseCase,
+    UpdateEmployeeUseCase, DeleteEmployeeUseCase, CreateEmployeeUseCase, GetRolesUseCase)
 from app.core.facades.auth import Auth
 
 from .view_models import CreateEmployeeViewModel, EmployeeResponse, ChangeRoleViewModel
@@ -27,6 +29,13 @@ async def get_employees(
     return list(
         map(lambda employee: EmployeeResponse.from_model(employee), employees)
     )
+
+
+@router.get('/roles', status_code=status.HTTP_200_OK)
+async def get_roles(
+        get_roles_use_case: Annotated[GetRolesUseCase, Depends(GetRolesUseCase)]
+):
+    return get_roles_use_case.execute()
 
 
 @router.get("/{employee_id}")

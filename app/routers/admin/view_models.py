@@ -1,4 +1,5 @@
 from datetime import datetime, date
+from enum import Enum
 from typing import List, Any
 
 from pydantic import BaseModel
@@ -134,9 +135,22 @@ class OrganizationResponse(CreateOrganizationViewModel):
                     ), model.departments
                 )
             )
-        if 'settings' in model.__dict__:
-            response.settings = OrganizationSettingsResponse(
-                roll_call_start_time=model.settings.roll_call_start_time,
-                roll_call_end_time=model.settings.roll_call_end_time
-            )
         return response
+
+
+class ScheduleDayEnum(str, Enum):
+    MONDAY = 'monday'
+    TUESDAY = 'tuesday'
+    WEDNESDAY = 'wednesday'
+    THURSDAY = 'thursday'
+    FRIDAY = 'friday'
+    SATURDAY = 'saturday'
+    SUNDAY = 'sunday'
+
+
+class ScheduleDayViewModel(BaseModel):
+    day: ScheduleDayEnum
+    work_start_time: str
+    work_end_time: str
+    roll_call_start_time: str
+    roll_call_end_time: str

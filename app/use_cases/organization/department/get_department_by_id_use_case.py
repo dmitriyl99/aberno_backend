@@ -4,6 +4,7 @@ from sqlalchemy.orm import sessionmaker, joinedload
 from fastapi import Depends
 
 from app.core.facades.auth import Auth
+from app.core.models.organization.schedule import Schedule
 from app.dal import get_session
 from app.core.models.organization import Department, Employee
 
@@ -18,7 +19,8 @@ class GetDepartmentByIdUseCase:
         current_user = Auth.get_current_user()
         with self.session() as session:
             department: Department = session.query(Department).options(
-                joinedload(Department.organization)
+                joinedload(Department.organization),
+                joinedload(Department.schedule).joinedload(Schedule.days)
             ).get(department_id)
             if not current_user.is_super_admin:
                 current_employee: Type[Employee] = session.query(Employee).filter(

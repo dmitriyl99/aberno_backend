@@ -48,8 +48,8 @@ async def create_schedule(
         create_department_schedule_use_case: Annotated[CreateDepartmentScheduleUseCase, Depends(CreateDepartmentScheduleUseCase)],
         days: List[ScheduleDayViewModel]
 ):
-    unique_days = set(map(lambda day: day.day, days))
-    if unique_days != 7:
+    unique_days = set(map(lambda day: day.day.value, days))
+    if len(unique_days) != 7:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='The week is not full'
@@ -57,7 +57,7 @@ async def create_schedule(
     schedule = create_department_schedule_use_case.execute(department_id, days)
 
     return list(
-        map(lambda day: ScheduleDayViewModel.from_model(day), schedule.days)
+        map(lambda day: ScheduleDayViewModel.from_model(day), schedule)
     )
 
 

@@ -16,7 +16,7 @@ class CreateDepartmentScheduleUseCase:
                  ):
         self.session = session
 
-    def execute(self, department_id: int, days: List[ScheduleDayViewModel]) -> Schedule:
+    def execute(self, department_id: int, days: List[ScheduleDayViewModel]) -> List[ScheduleDay]:
         with self.session() as session:
             department: Department = session.query(Department).options(
                 joinedload(Department.schedule).joinedload(Schedule.days)
@@ -25,6 +25,7 @@ class CreateDepartmentScheduleUseCase:
             if not schedule:
                 schedule = Schedule(department_id=department_id)
             schedule.updated_at = datetime.datetime.now()
+            result_days = []
             for day in days:
                 schedule_days = list(
                     filter(
@@ -32,7 +33,7 @@ class CreateDepartmentScheduleUseCase:
                     )
                 )
                 if len(schedule_days) == 0:
-                    schedule_day = ScheduleDay(day=day)
+                    schedule_day = ScheduleDay(day=day.day)
                     schedule.days.append(schedule_day)
                 else:
                     schedule_day = schedule_days[0]
@@ -41,9 +42,14 @@ class CreateDepartmentScheduleUseCase:
                 schedule_day.roll_call_start_time = day.roll_call_start_time,
                 schedule_day.roll_call_end_time = day.roll_call_end_time
                 schedule_day.is_work_day = day.is_work_day
+                result_days.append(schedule_day)
             session.add(schedule)
             session.commit()
             session.refresh(schedule)
-            session.refresh(schedule.days)
+            department.schedule_id = schedule.id
+            session.commit()
 
-            return schedule
+            for result_day in result_days:
+                session.refresh(result_day)
+
+            return result_days

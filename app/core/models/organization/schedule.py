@@ -12,7 +12,7 @@ class Schedule(TimestampMixin, Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     department_id: Mapped[int] = mapped_column(ForeignKey('departments.id'))
 
-    days: Mapped[List["ScheduleDay"]] = relationship()
+    days: Mapped[List["ScheduleDay"]] = relationship(lazy='joined')
 
 
 class ScheduleDay(Base):

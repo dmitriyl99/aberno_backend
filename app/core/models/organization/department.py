@@ -13,8 +13,9 @@ class Department(Base, TimestampMixin):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(Text)
     organization_id: Mapped[int] = mapped_column(ForeignKey("organizations.id"))
+    schedule_id: Mapped[int] = mapped_column(ForeignKey("schedules.id"))
 
     organization: Mapped["Organization"] = relationship(back_populates='departments')
     employees: Mapped[List["Employee"]] = relationship(back_populates='department')
 
-    schedule: Mapped["Schedule"] = relationship()
+    schedule: Mapped["Schedule"] = relationship(foreign_keys=[schedule_id])

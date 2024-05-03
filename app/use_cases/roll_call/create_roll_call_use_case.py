@@ -89,7 +89,7 @@ class CreateRollCallUseCase:
                         status_code=status.HTTP_400_BAD_REQUEST,
                         detail='You are not on the territory of the organization'
                     )
-            roll_call_end_time_parsed = None
+            roll_call_end_time_parsed = ['11', '00']
             if organization.settings and organization.settings.roll_call_end_time:
                 roll_call_end_time_parsed = organization.settings.roll_call_end_time.split(':')
             schedule_day = get_current_schedule_day()

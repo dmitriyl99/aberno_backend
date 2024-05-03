@@ -105,7 +105,10 @@ async def get_employee_roll_call_history(
         date_roll_call = None
         if len(filtered_roll_calls) > 0:
             date_roll_call = filtered_roll_calls[0]
-        result[current_date.strftime('%Y-%m-%d')] = date_roll_call.status if date_roll_call else None
+        result[current_date.strftime('%Y-%m-%d')] = {
+            'status': date_roll_call.status,
+            'note': date_roll_call.note
+        } if date_roll_call else None
         current_date += timedelta(days=1)
 
     sickness_roll_calls = filter(

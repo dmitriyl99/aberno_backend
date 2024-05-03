@@ -40,6 +40,7 @@ class CreateDepartmentScheduleUseCase:
                 schedule_day.work_end_time = day.work_end_time,
                 schedule_day.roll_call_start_time = day.roll_call_start_time,
                 schedule_day.roll_call_end_time = day.roll_call_end_time
+                schedule_day.is_work_day = day.is_work_day
             session.add(schedule)
             session.commit()
             session.refresh(schedule)

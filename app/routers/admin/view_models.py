@@ -20,10 +20,11 @@ class ScheduleDayEnum(str, Enum):
 
 class ScheduleDayViewModel(BaseModel):
     day: ScheduleDayEnum
-    work_start_time: str
-    work_end_time: str
-    roll_call_start_time: str
-    roll_call_end_time: str
+    is_work_day: bool = True
+    work_start_time: str | None = None
+    work_end_time: str | None = None
+    roll_call_start_time: str | None = None
+    roll_call_end_time: str | None = None
 
     @staticmethod
     def from_model(day):

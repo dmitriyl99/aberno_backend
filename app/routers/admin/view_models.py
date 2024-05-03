@@ -30,6 +30,7 @@ class CreateEmployeeViewModel(BaseModel):
     position: str
     phone: str
     department_id: int
+    organization_id: int | None = None
 
     role_id: int | None = None
 

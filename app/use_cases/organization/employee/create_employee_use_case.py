@@ -56,18 +56,23 @@ class CreateEmployeeUseCase:
             session.add(user)
             if data.role_id:
                 role: Role = session.query(Role).get(data.role_id)
-
             else:
                 role: Role = session.query(Role).get(0)
             user.roles.append(role)
             session.commit()
             session.refresh(user)
+            organization_id = data.organization_id
+            if organization_id and organization_id != current_employee.organization_id:
+                if not current_user.is_super_admin:
+                    organization_id = current_employee.organization_id
+            if not organization_id:
+                organization_id = current_employee.organization_id
             employee = Employee(
                 phone=data.phone,
                 position=data.position,
                 user_id=user.id,
                 department_id=data.department_id,
-                organization_id=current_employee.organization_id,
+                organization_id=organization_id,
                 created_by_id=current_user.id
             )
             session.add(employee)

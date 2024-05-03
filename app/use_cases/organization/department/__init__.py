@@ -3,3 +3,4 @@ from .get_departments_use_case import GetDepartmentsUseCase
 from .get_department_by_id_use_case import GetDepartmentByIdUseCase
 from .delete_department_use_case import DeleteDepartmentUseCase
 from .update_department_use_case import UpdateDepartmentUseCase
+from .create_department_schedule_use_case import CreateDepartmentScheduleUseCase

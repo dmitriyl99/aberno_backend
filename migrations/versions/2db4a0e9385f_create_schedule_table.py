@@ -22,6 +22,8 @@ def upgrade() -> None:
         'schedules',
         sa.Column('id', sa.Integer, primary_key=True),
         sa.Column('department_id', sa.Integer, sa.ForeignKey('departments.id'), nullable=False),
+        sa.Column('created_at', sa.DateTime(), nullable=False),
+        sa.Column('updated_at', sa.DateTime(), nullable=False),
     )
 
     op.add_column(

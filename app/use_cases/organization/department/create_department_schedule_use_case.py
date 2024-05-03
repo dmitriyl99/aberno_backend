@@ -1,3 +1,4 @@
+import datetime
 from typing import Annotated, List
 
 from fastapi import Depends
@@ -23,6 +24,7 @@ class CreateDepartmentScheduleUseCase:
             schedule = department.schedule
             if not schedule:
                 schedule = Schedule(department_id=department_id)
+            schedule.updated_at = datetime.datetime.now()
             for day in days:
                 schedule_days = list(
                     filter(

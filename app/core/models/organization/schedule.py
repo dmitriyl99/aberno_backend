@@ -15,7 +15,7 @@ class Schedule(TimestampMixin, Base):
     days: Mapped[List["ScheduleDay"]] = relationship()
 
 
-class ScheduleDay(TimestampMixin, Base):
+class ScheduleDay(Base):
     __tablename__ = 'schedule_days'
 
     id: Mapped[int] = mapped_column(primary_key=True)

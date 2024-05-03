@@ -4,8 +4,8 @@ from fastapi import APIRouter, Depends, status, HTTPException
 
 from app.use_cases.organization.department import (CreateDepartmentUseCase, GetDepartmentByIdUseCase,
                                                    GetDepartmentsUseCase, UpdateDepartmentUseCase, 
-                                                   DeleteDepartmentUseCase)
-from .view_models import CreateDepartmentViewModel, DepartmentResponse
+                                                   DeleteDepartmentUseCase, CreateDepartmentScheduleUseCase)
+from .view_models import CreateDepartmentViewModel, DepartmentResponse, ScheduleDayViewModel
 
 router = APIRouter(prefix="/departments", tags=['admin-departments'])
 
@@ -37,7 +37,28 @@ async def get_department(
             detail='Department with id {} not found'.format(department_id)
         )
 
-    return DepartmentResponse.from_model(department)
+    return DepartmentResponse.from_model(department)\
+
+
+
+@router.post('/{department_id}/schedule',
+             status_code=status.HTTP_201_CREATED, response_model=List[ScheduleDayViewModel])
+async def create_schedule(
+        department_id: int,
+        create_department_schedule_use_case: Annotated[CreateDepartmentScheduleUseCase, Depends(CreateDepartmentScheduleUseCase)],
+        days: List[ScheduleDayViewModel]
+):
+    unique_days = set(map(lambda day: day.day, days))
+    if unique_days != 7:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='The week is not full'
+        )
+    schedule = create_department_schedule_use_case.execute(department_id, days)
+
+    return list(
+        map(lambda day: ScheduleDayViewModel.from_model(day), schedule.days)
+    )
 
 
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=DepartmentResponse)

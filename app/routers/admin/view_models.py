@@ -8,6 +8,34 @@ from app.core.models.organization import Organization, Department, Employee
 from app.routers.auth.view_models import CurrentUserViewModel
 
 
+class ScheduleDayEnum(str, Enum):
+    MONDAY = 'monday'
+    TUESDAY = 'tuesday'
+    WEDNESDAY = 'wednesday'
+    THURSDAY = 'thursday'
+    FRIDAY = 'friday'
+    SATURDAY = 'saturday'
+    SUNDAY = 'sunday'
+
+
+class ScheduleDayViewModel(BaseModel):
+    day: ScheduleDayEnum
+    work_start_time: str
+    work_end_time: str
+    roll_call_start_time: str
+    roll_call_end_time: str
+
+    @staticmethod
+    def from_model(day):
+        return ScheduleDayViewModel(
+            day=day.day,
+            work_start_time=day.work_start_time,
+            work_end_time=day.work_end_time,
+            roll_call_start_time=day.roll_call_start_time,
+            roll_call_end_time=day.roll_call_end_time,
+        )
+
+
 class CreateOrganizationViewModel(BaseModel):
     name: str
     legal_name: str
@@ -44,6 +72,7 @@ class DepartmentResponse(BaseModel):
     id: int
     name: str
     organization: object | None = None
+    schedule: List[ScheduleDayViewModel] | None = None
 
     created_at: datetime
     updated_at: datetime
@@ -58,6 +87,8 @@ class DepartmentResponse(BaseModel):
         )
         if 'organization' in model.__dict__:
             response.organization = OrganizationResponse.from_model(model.organization)
+        if 'schedule' in model.__dict__ and model.schedule:
+            response.schedule = list(map(ScheduleDayViewModel.from_model, model.schedule.days))
 
         return response
 
@@ -136,21 +167,3 @@ class OrganizationResponse(CreateOrganizationViewModel):
                 )
             )
         return response
-
-
-class ScheduleDayEnum(str, Enum):
-    MONDAY = 'monday'
-    TUESDAY = 'tuesday'
-    WEDNESDAY = 'wednesday'
-    THURSDAY = 'thursday'
-    FRIDAY = 'friday'
-    SATURDAY = 'saturday'
-    SUNDAY = 'sunday'
-
-
-class ScheduleDayViewModel(BaseModel):
-    day: ScheduleDayEnum
-    work_start_time: str
-    work_end_time: str
-    roll_call_start_time: str
-    roll_call_end_time: str

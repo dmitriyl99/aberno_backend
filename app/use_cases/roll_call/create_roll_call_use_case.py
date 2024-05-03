@@ -7,28 +7,58 @@ from starlette import status
 
 from datetime import date, datetime
 
+from app.core.models.organization.schedule import ScheduleDay
 from app.core.models.roll_call.sick_leave import SickLeave
 from app.dal import get_session
+from app.routers.admin.view_models import ScheduleDayEnum
 from app.routers.roll_call.view_models import RollCallViewModel, RollCallStatusEnum
 from app.core.models.roll_call.roll_call import RollCall, Location
 from app.core.models.auth import User
 from app.tasks.organization.get_current_employee_task import GetCurrentEmployeeTask
 from app.tasks.organization.get_organization_by_id_task import GetOrganizationByIdTask
+from app.use_cases.organization.department import GetDepartmentByIdUseCase
 
 
 class CreateRollCallUseCase:
     def __init__(self,
                  session: Annotated[sessionmaker, Depends(get_session)],
                  get_current_employee_task: Annotated[GetCurrentEmployeeTask, Depends(GetCurrentEmployeeTask)],
-                 get_organization_by_id_task: Annotated[GetOrganizationByIdTask, Depends(GetOrganizationByIdTask)]
+                 get_organization_by_id_task: Annotated[GetOrganizationByIdTask, Depends(GetOrganizationByIdTask)],
+                 get_department_by_id_use_case: Annotated[GetDepartmentByIdUseCase, Depends(GetDepartmentByIdUseCase)]
     ):
         self.session = session
         self.get_current_employee_task = get_current_employee_task
         self.get_organization_by_id_use_case = get_organization_by_id_task
+        self.get_department_by_id_use_case = get_department_by_id_use_case
 
     def execute(self, data: RollCallViewModel, user: User) -> RollCall:
         employee = self.get_current_employee_task.run(user)
         organization = self.get_organization_by_id_use_case.run(employee.organization_id)
+        department = self.get_department_by_id_use_case.execute(employee.department_id)
+
+        def get_current_schedule_day() -> ScheduleDay | None:
+            if department.schedule:
+                weekday = now.isoweekday()
+                weekdays_mapper = {
+                    1: ScheduleDayEnum.MONDAY,
+                    2: ScheduleDayEnum.TUESDAY,
+                    3: ScheduleDayEnum.WEDNESDAY,
+                    4: ScheduleDayEnum.THURSDAY,
+                    5: ScheduleDayEnum.FRIDAY,
+                    6: ScheduleDayEnum.SATURDAY,
+                    7: ScheduleDayEnum.SUNDAY
+                }
+                schedule_day: ScheduleDay = list(
+                    filter(
+                        lambda day: day.day == weekdays_mapper[weekday], department.schedule.days
+                    )
+                )[0]
+
+                return schedule_day
+
+            return None
+
+        now = datetime.now()
 
         roll_call = RollCall(
             department_id=employee.department_id,
@@ -59,22 +89,32 @@ class CreateRollCallUseCase:
                         status_code=status.HTTP_400_BAD_REQUEST,
                         detail='You are not on the territory of the organization'
                     )
+            roll_call_end_time_parsed = None
             if organization.settings and organization.settings.roll_call_end_time:
-                now = datetime.now()
-                roll_call_start_time_parsed = organization.settings.roll_call_end_time.split(':')
+                roll_call_end_time_parsed = organization.settings.roll_call_end_time.split(':')
+            schedule_day = get_current_schedule_day()
+            if schedule_day and schedule_day.roll_call_end_time:
+                roll_call_end_time_parsed = schedule_day.roll_call_end_time.split(':')
+            if roll_call_end_time_parsed:
                 roll_call_end_time = datetime(
                     now.year,
                     now.month,
                     now.day,
-                    int(roll_call_start_time_parsed[0]),
-                    int(roll_call_start_time_parsed[1])
+                    int(roll_call_end_time_parsed[0]),
+                    int(roll_call_end_time_parsed[1])
                 )
                 if now > roll_call_end_time:
                     data.status = RollCallStatusEnum.LATE
 
         elif data.status == RollCallStatusEnum.OFF_DAY:
             today = date.today()
-            if today.isoweekday() not in (6, 7): # Saturday and Sunday
+            schedule_day = get_current_schedule_day()
+            if schedule_day and not schedule_day.is_work_day:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail='Today is not weekend'
+                )
+            if not schedule_day and today.isoweekday() not in (6, 7): # Saturday and Sunday
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail='Today is not weekend'

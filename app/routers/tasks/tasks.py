@@ -9,11 +9,10 @@ from app.use_cases.tasks import GetTasksUseCase, UpdateTaskUseCase, ChangeTaskSt
 from app.core.facades.auth import Auth
 from ...tasks.organization.get_current_employee_task import GetCurrentEmployeeTask
 
-
 router = APIRouter(prefix='/tasks', tags=['tasks'], dependencies=[Depends(verify_authenticated_user)])
 
 
-@router.get('/', response_model=List[TaskResponse])
+@router.get('/')
 async def get_tasks(
         get_tasks_use_case: Annotated[GetTasksUseCase, Depends(GetTasksUseCase)],
         department_id: int | None = None,
@@ -21,18 +20,23 @@ async def get_tasks(
         status: str | None = None,
         priority: str | None = None,
         deadline: date | None = None,
-        search: str | None = None
+        search: str | None = None,
+        page: int = 1,
+        per_page: int = 10
 ):
-    tasks = get_tasks_use_case.execute(
-        department_id, executor_id, status, priority, deadline, search
+    tasks, count = get_tasks_use_case.execute(
+        department_id, executor_id, status, priority, deadline, search, page, per_page
     )
 
-    return list(
-        map(TaskResponse.from_model, tasks)
-    )
+    return {
+        'count': count,
+        'data': list(
+            map(TaskResponse.from_model, tasks)
+        )
+    }
 
 
-@router.get('/my-tasks', response_model=List[TaskResponse])
+@router.get('/my-tasks')
 async def get_my_tasks(
         get_tasks_use_case: Annotated[GetTasksUseCase, Depends(GetTasksUseCase)],
         get_current_employee_task: Annotated[GetCurrentEmployeeTask, Depends(GetCurrentEmployeeTask)],
@@ -41,15 +45,20 @@ async def get_my_tasks(
         priority: str | None = None,
         deadline: date | None = None,
         search: str | None = None,
+        page: int = 1,
+        per_page: int = 10
 ):
     executor_id = get_current_employee_task.run(Auth.get_current_user()).id
-    tasks = get_tasks_use_case.execute(
-        department_id, executor_id, status, priority, deadline, search
+    tasks, count = get_tasks_use_case.execute(
+        department_id, executor_id, status, priority, deadline, search, page, per_page
     )
 
-    return list(
-        map(TaskResponse.from_model, tasks)
-    )
+    return {
+        'count': count,
+        'data': list(
+            map(TaskResponse.from_model, tasks)
+        )
+    }
 
 
 @router.post('/', response_model=TaskResponse, status_code=http_status.HTTP_201_CREATED)

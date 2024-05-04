@@ -22,7 +22,9 @@ class GetTasksUseCase:
                 status: str | None,
                 priority: str | None,
                 deadline: date | None,
-                search: str | None
+                search: str | None,
+                page: int = 1,
+                per_page: int = 10
                 ):
         with self.session() as session:
             query = session.query(Task).options(
@@ -44,4 +46,7 @@ class GetTasksUseCase:
                 query = query.filter(
                     or_(Task.title.ilike(f'%{search}%'), Task.description.ilike(f'%{search}%'))
                 )
-            return query.all()
+            query = query.order_by(Task.created_at.desc())
+            count = query.count()
+            query = query.limit(per_page).offset((page - 1) * per_page)
+            return query.all(), count

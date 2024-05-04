@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 
 from app.routers.auth import authentication
 from app.routers import organization, roll_call, admin
+from app.routers.tasks import tasks
 from app import schedule
 
 from app.settings import settings
@@ -26,3 +27,4 @@ for router in organization.routers:
 for router in roll_call.routers:
     app.include_router(router=router, prefix='/api')
 app.include_router(admin.router, prefix='/api')
+app.include_router(tasks.router, prefix='/api')

@@ -39,11 +39,15 @@ class EmployeeResponse(BaseModel):
 class TaskViewModel(BaseModel):
     title: str
     description: str | None
-    priority: TaskPriorityEnum
+    priority: TaskPriorityEnum | None
     deadline: date | None
 
     department_id: int | None
     executor_id: int | None
+
+
+class TaskStatusViewModel(BaseModel):
+    status: TaskStatusEnum
 
 
 class TaskResponse(TaskViewModel):
@@ -69,7 +73,9 @@ class TaskResponse(TaskViewModel):
             department_id=task.department_id,
             executor_id=task.executor_id,
             status=task.status,
-            created_by_id=task.created_by_id
+            created_by_id=task.created_by_id,
+            created_at=task.created_at,
+            updated_at=task.updated_at
         )
         if 'department' in task.__dict__ and task.department:
             response.department = DepartmentResponse.from_model(task.department)

@@ -1,6 +1,7 @@
 from typing import Annotated
 
 from fastapi import Depends, HTTPException
+from sqlalchemy import and_, cast, Date
 from sqlalchemy.orm import sessionmaker
 import geopy.distance
 from starlette import status
@@ -35,6 +36,19 @@ class CreateRollCallUseCase:
         employee = self.get_current_employee_task.run(user)
         organization = self.get_organization_by_id_use_case.run(employee.organization_id)
         department = self.get_department_by_id_use_case.execute(employee.department_id)
+
+        with self.session() as session:
+            today_roll_call = session.query(RollCall).filter(
+                and_(
+                    RollCall.employee_id == employee.id,
+                    cast(RollCall.created_at, Date) == date.today()
+                )
+            ).first()
+            if today_roll_call:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Today roll call already exists"
+                )
 
         def get_current_schedule_day() -> ScheduleDay | None:
             if department.schedule:

@@ -136,6 +136,7 @@ class EmployeeResponse(BaseModel):
 class OrganizationSettingsViewModel(BaseModel):
     roll_call_start_time: str | None = None
     roll_call_end_time: str | None = None
+    roll_call_distance: int | None = None
 
 
 class OrganizationResponse(CreateOrganizationViewModel):

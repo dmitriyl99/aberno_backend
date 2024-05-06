@@ -12,3 +12,4 @@ class OrganizationSettings(Base):
 
     roll_call_start_time: Mapped[str] = mapped_column(String(5))
     roll_call_end_time: Mapped[str] = mapped_column(String(5))
+    roll_call_distance: Mapped[int] = mapped_column(Integer, default=200)

@@ -29,6 +29,7 @@ class UpdateOrganizationSettingsUseCase:
                 settings.organization_id = employee.organization_id
             settings.roll_call_start_time = data.roll_call_start_time
             settings.roll_call_end_time = data.roll_call_end_time
+            settings.roll_call_distance = data.roll_call_distance
             session.add(settings)
             session.commit()
             session.refresh(settings)

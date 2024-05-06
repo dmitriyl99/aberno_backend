@@ -119,7 +119,10 @@ async def get_employee_roll_call_history(
         while current_date <= roll_call.sick_leave.date_to:
             current_date_str = current_date.strftime('%Y-%m-%d')
             if current_date_str in result and not result[current_date_str]:
-                result[current_date_str] = 'SICK'
+                result[current_date_str] = {
+                    'status': RollCallStatusEnum.SICK,
+                    'note': roll_call.note
+                }
             current_date += timedelta(days=1)
 
     return result

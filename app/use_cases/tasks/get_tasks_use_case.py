@@ -32,16 +32,16 @@ class GetTasksUseCase:
                 joinedload(Task.executor).joinedload(Employee.user),
                 joinedload(Task.created_by).joinedload(Employee.user)
             )
-            if department_id:
+            if department_id and department_id != 0:
                 query = query.filter(Task.department_id == department_id)
-            if executor_id:
+            if executor_id and executor_id != 0:
                 query = query.filter(Task.executor_id == executor_id)
             if status:
                 query = query.filter(Task.status == status)
             if priority:
                 query = query.filter(Task.priority == priority)
-            if deadline:
-                query = query.filter(Task.deadline == date)
+            if deadline and deadline != 0:
+                query = query.filter(Task.deadline == deadline)
             if search:
                 query = query.filter(
                     or_(Task.title.ilike(f'%{search}%'), Task.description.ilike(f'%{search}%'))

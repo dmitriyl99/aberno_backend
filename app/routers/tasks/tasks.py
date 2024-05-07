@@ -5,7 +5,13 @@ from fastapi import APIRouter, Depends, status as http_status
 
 from app.dependencies import verify_authenticated_user
 from .view_models import TaskResponse, TaskViewModel, TaskStatusViewModel
-from app.use_cases.tasks import GetTasksUseCase, UpdateTaskUseCase, ChangeTaskStatusUseCase, CreateTaskUseCase
+from app.use_cases.tasks import (
+    GetTasksUseCase,
+    UpdateTaskUseCase,
+    ChangeTaskStatusUseCase,
+    CreateTaskUseCase,
+    GetTaskByIdUseCase
+)
 from app.core.facades.auth import Auth
 from ...tasks.organization.get_current_employee_task import GetCurrentEmployeeTask
 
@@ -59,6 +65,15 @@ async def get_my_tasks(
             map(TaskResponse.from_model, tasks)
         )
     }
+
+
+@router.get('/{task_id}', response_model=TaskResponse)
+async def get_task(
+        task_id: int,
+        get_task_by_id_use_case: Annotated[GetTaskByIdUseCase, Depends(GetTaskByIdUseCase)]
+):
+    task = get_task_by_id_use_case.execute(task_id)
+    return TaskResponse.from_model(task)
 
 
 @router.post('/', response_model=TaskResponse, status_code=http_status.HTTP_201_CREATED)

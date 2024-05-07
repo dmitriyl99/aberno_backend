@@ -2,3 +2,4 @@ from .get_tasks_use_case import GetTasksUseCase
 from .create_task_use_case import CreateTaskUseCase
 from .update_task_use_case import UpdateTaskUseCase
 from .change_task_status_use_case import ChangeTaskStatusUseCase
+from .get_task_by_id_use_case import GetTaskByIdUseCase

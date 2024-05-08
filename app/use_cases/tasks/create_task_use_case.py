@@ -27,6 +27,7 @@ class CreateTaskUseCase:
                 status=TaskStatusEnum.PENDING.value,
                 priority=dto.priority.value,
                 deadline=dto.deadline,
+                organization_id=current_employee.organization_id,
                 department_id=dto.department_id,
                 executor_id=dto.executor_id,
                 created_by_id=current_employee.id

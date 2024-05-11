@@ -43,7 +43,8 @@ class GetTasksUseCase:
             if executor_id and executor_id != 0:
                 query = query.filter(Task.executor_id == executor_id)
             if status:
-                query = query.filter(Task.status == status)
+                statuses = status.split(',')
+                query = query.filter(Task.status.in_(statuses))
             if priority:
                 query = query.filter(Task.priority == priority)
             if deadline and deadline != 0:

@@ -9,7 +9,7 @@ from app.dal import get_session
 from sqlalchemy.orm import sessionmaker, joinedload
 
 
-class GetCurrentEmployeeTask():
+class GetCurrentEmployeeTask:
     def __init__(self, session: Annotated[sessionmaker, Depends(get_session)]):
         self.session = session
 

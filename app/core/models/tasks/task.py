@@ -1,7 +1,7 @@
 from enum import Enum
-from datetime import date
+from datetime import datetime
 
-from sqlalchemy import Integer, Date, String, Text, ForeignKey
+from sqlalchemy import String, Text, ForeignKey, Boolean, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .. import Base, TimestampMixin
@@ -29,7 +29,8 @@ class Task(Base, TimestampMixin):
     description: Mapped[str] = mapped_column(Text)
     status: Mapped[str] = mapped_column(String(50))
     priority: Mapped[str] = mapped_column(String(50))
-    deadline: Mapped[date] = mapped_column(Date)
+    deadline: Mapped[datetime] = mapped_column(DateTime)
+    viewed: Mapped[bool] = mapped_column(Boolean(), default=False)
 
     department_id: Mapped[int] = mapped_column(ForeignKey('departments.id'))
     executor_id: Mapped[str] = mapped_column(ForeignKey('employees.id'))

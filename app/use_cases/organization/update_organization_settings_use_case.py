@@ -30,6 +30,7 @@ class UpdateOrganizationSettingsUseCase:
             settings.roll_call_start_time = data.roll_call_start_time
             settings.roll_call_end_time = data.roll_call_end_time
             settings.roll_call_distance = data.roll_call_distance
+            settings.work_leave_enabled = data.work_leave_enabled
             session.add(settings)
             session.commit()
             session.refresh(settings)

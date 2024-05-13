@@ -49,7 +49,8 @@ async def get_organization_settings(
     return OrganizationSettingsViewModel(
         roll_call_start_time=settings.roll_call_start_time if settings else None,
         roll_call_end_time=settings.roll_call_end_time if settings else None,
-        roll_call_distance=settings.roll_call_distance if settings else None
+        roll_call_distance=settings.roll_call_distance if settings else None,
+        work_leave_enabled=settings.work_leave_enabled
     )
 
 
@@ -65,7 +66,8 @@ async def update_organization_settings(
     return OrganizationSettingsViewModel(
         roll_call_start_time=settings.roll_call_start_time,
         roll_call_end_time=settings.roll_call_end_time,
-        roll_call_distance=settings.roll_call_distance
+        roll_call_distance=settings.roll_call_distance,
+        work_leave_enabled=settings.work_leave_enabled
     )
 
 

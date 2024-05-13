@@ -13,6 +13,7 @@ class RollCallStatusEnum(str, Enum):
     SICK = 'SICK'
     ABSENT = 'ABSENT'
     REASONED = 'REASONED'
+    LEAVE_WORK = 'LEAVE_WORK'
 
 
 class RollCallLocation(BaseModel):

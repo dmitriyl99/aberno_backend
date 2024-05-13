@@ -26,7 +26,7 @@ class CreateRollCallUseCase:
                  get_current_employee_task: Annotated[GetCurrentEmployeeTask, Depends(GetCurrentEmployeeTask)],
                  get_organization_by_id_task: Annotated[GetOrganizationByIdTask, Depends(GetOrganizationByIdTask)],
                  get_department_by_id_use_case: Annotated[GetDepartmentByIdUseCase, Depends(GetDepartmentByIdUseCase)]
-    ):
+                 ):
         self.session = session
         self.get_current_employee_task = get_current_employee_task
         self.get_organization_by_id_use_case = get_organization_by_id_task
@@ -36,19 +36,6 @@ class CreateRollCallUseCase:
         employee = self.get_current_employee_task.run(user)
         organization = self.get_organization_by_id_use_case.run(employee.organization_id)
         department = self.get_department_by_id_use_case.execute(employee.department_id)
-
-        with self.session() as session:
-            today_roll_call = session.query(RollCall).filter(
-                and_(
-                    RollCall.employee_id == employee.id,
-                    cast(RollCall.created_at, Date) == date.today()
-                )
-            ).first()
-            if today_roll_call:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Today roll call already exists"
-                )
 
         def get_current_schedule_day() -> ScheduleDay | None:
             if department.schedule:
@@ -72,18 +59,44 @@ class CreateRollCallUseCase:
 
             return None
 
-        now = datetime.now()
-
-        roll_call = RollCall(
-            department_id=employee.department_id,
-            employee_id=employee.id,
-            organization_id=employee.organization_id,
-            status=data.status,
-            note=data.note
-        )
+        if (organization.settings and
+                not organization.settings.work_leave_enabled and
+                data.status == RollCallStatusEnum.LEAVE_WORK):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='This status is not allowed in your organization'
+            )
+        if data.status != RollCallStatusEnum.LEAVE_WORK:
+            with self.session() as session:
+                today_roll_call = session.query(RollCall).filter(
+                    and_(
+                        RollCall.employee_id == employee.id,
+                        cast(RollCall.created_at, Date) == date.today()
+                    )
+                ).first()
+                if today_roll_call:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="Today roll call already exists"
+                    )
+        if data.status == RollCallStatusEnum.LEAVE_WORK:
+            with self.session() as session:
+                today_on_work_roll_call = session.query(RollCall).filter(
+                    and_(
+                        RollCall.employee_id == employee.id,
+                        RollCall.status == RollCallStatusEnum.ON_WORK.value,
+                        cast(RollCall.created_at, Date) == date.today()
+                    )
+                ).first()
+                if not today_on_work_roll_call:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="There is no record about on work today"
+                    )
 
         roll_call_location: Location | None = None
         sick_leave: SickLeave | None = None
+        now = datetime.now()
 
         if data.location and data.location.lat and data.location.lng:
             roll_call_location = Location(
@@ -129,13 +142,11 @@ class CreateRollCallUseCase:
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail='Today is not weekend'
                 )
-            if not schedule_day and today.isoweekday() not in (6, 7): # Saturday and Sunday
+            if not schedule_day and today.isoweekday() not in (6, 7):  # Saturday and Sunday
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail='Today is not weekend'
                 )
-        elif data.status == RollCallStatusEnum.REASONED:
-            roll_call.note = data.note
         elif data.status == RollCallStatusEnum.SICK:
             if not data.sick_leave:
                 raise HTTPException(
@@ -148,6 +159,14 @@ class CreateRollCallUseCase:
                 date_to=data.sick_leave.date_to,
                 employee_id=employee.id
             )
+
+        roll_call = RollCall(
+            department_id=employee.department_id,
+            employee_id=employee.id,
+            organization_id=employee.organization_id,
+            status=data.status,
+            note=data.note
+        )
 
         with self.session() as session:
             session.add(roll_call)
@@ -164,4 +183,3 @@ class CreateRollCallUseCase:
             session.refresh(roll_call)
 
         return roll_call
-

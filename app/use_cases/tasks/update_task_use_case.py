@@ -30,7 +30,7 @@ class UpdateTaskUseCase:
                 )
             task.title = dto.title,
             task.description = dto.description,
-            task.priority = dto.priority,
+            task.priority = dto.priority.value,
             task.deadline = dto.deadline,
             task.department_id = dto.department_id,
             task.executor_id = dto.executor_id

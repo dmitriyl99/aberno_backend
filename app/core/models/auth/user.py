@@ -19,6 +19,7 @@ class User(Base, TimestampMixin):
     username: Mapped[str] = mapped_column(String(100))
     password: Mapped[str] = mapped_column(Text)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    firebase_notification_token: Mapped[str] = mapped_column(Text, nullable=True)
 
     roles: Mapped[List[Role]] = relationship(secondary=roles_users)
     permissions: Mapped[List[Permission]] = relationship(secondary=permissions_users)

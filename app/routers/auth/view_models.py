@@ -15,6 +15,10 @@ class LoginForm(BaseModel):
     password: str
 
 
+class FirebaseToken(BaseModel):
+    token: str
+
+
 class RoleViewModel(BaseModel):
     id: int
     name: str

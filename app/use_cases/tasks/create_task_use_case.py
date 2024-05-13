@@ -7,15 +7,18 @@ from app.core.models.tasks import Task, TaskStatusEnum
 from app.routers.tasks.view_models import TaskViewModel
 from app.core.facades.auth import Auth
 from app.tasks.organization.get_current_employee_task import GetCurrentEmployeeTask
+from app.tasks.send_notification_task import SendNotificationTask
 
 
 class CreateTaskUseCase:
     def __init__(self,
                  session: Annotated[sessionmaker, Depends(get_session)],
-                 get_current_employee_task: Annotated[GetCurrentEmployeeTask, Depends(GetCurrentEmployeeTask)]
+                 get_current_employee_task: Annotated[GetCurrentEmployeeTask, Depends(GetCurrentEmployeeTask)],
+                 send_notification_task: Annotated[SendNotificationTask, Depends(SendNotificationTask)]
                  ):
         self.session = session
         self.get_current_employee_task = get_current_employee_task
+        self.send_notification_task = send_notification_task
 
     def execute(self, dto: TaskViewModel):
         current_user = Auth.get_current_user()
@@ -38,5 +41,12 @@ class CreateTaskUseCase:
             session.refresh(task.department)
             session.refresh(task.executor)
             session.refresh(task.created_by)
+
+            if task.executor:
+                self.send_notification_task.run(
+                    f"Вам назначена задача {task.title}",
+                    "Нажмите, чтобы посмотреть",
+                    task.executor.user_id
+                )
 
             return task

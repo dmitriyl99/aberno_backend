@@ -6,6 +6,8 @@ from app.routers.auth import authentication
 from app.routers import organization, roll_call, admin
 from app.routers.tasks import tasks
 from app import schedule
+from firebase_admin import credentials, initialize_app
+import os
 
 from app.settings import settings
 
@@ -13,6 +15,8 @@ from app.settings import settings
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     schedule.start()
+    firebase_cred = credentials.Certificate(os.path.join(os.getcwd(), 'firebase-certificate.json'))
+    initialize_app(firebase_cred)
 
     yield
 

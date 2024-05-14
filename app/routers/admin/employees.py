@@ -1,3 +1,4 @@
+import datetime
 from datetime import date, timedelta
 from typing import Annotated
 import calendar
@@ -18,6 +19,7 @@ from app.core.facades.auth import Auth
 
 from .view_models import CreateEmployeeViewModel, EmployeeResponse, ChangeRoleViewModel
 from ..roll_call.view_models import RollCallStatusEnum
+from ...core.models.roll_call.roll_call import RollCall
 from ...use_cases.organization.employee.change_employee_role_use_case import ChangeEmployeeRoleUseCase
 from ...use_cases.roll_call.get_roll_call_history_user_case import GetRollCallHistoryUseCase
 
@@ -102,13 +104,48 @@ async def get_employee_roll_call_history(
             filter(
                 lambda r: r.created_at.date() == current_date, roll_call_history
             ))
-        date_roll_call = None
+        date_roll_call: RollCall | None = None
         if len(filtered_roll_calls) > 0:
             date_roll_call = filtered_roll_calls[0]
         result[current_date.strftime('%Y-%m-%d')] = {
-            'status': date_roll_call.status,
-            'note': date_roll_call.note
-        } if date_roll_call else {'status': None, 'note': None}
+            'status': None, 'note': None, 'on-work': None, 'leave-work': None, 'work-duration': None
+        }
+        if date_roll_call:
+            on_work_time = None
+            leave_work_time = None
+            work_duration = None
+            if date_roll_call.status == RollCallStatusEnum.ON_WORK:
+                on_work_time = date_roll_call.created_at
+                leave_work_roll_call = list(
+                    filter(
+                        lambda
+                            rch: rch.created_at.date() == current_date and rch.status == RollCallStatusEnum.LEAVE_WORK,
+                        roll_call_history
+                    )
+                )
+                if len(leave_work_roll_call) > 0:
+                    leave_work_time = leave_work_roll_call[0].created_at
+            if date_roll_call.status == RollCallStatusEnum.LEAVE_WORK:
+                leave_work_time = date_roll_call.created_at
+                on_work_roll_call = list(
+                    filter(
+                        lambda rch: rch.created_at.date() == current_date and rch.status == RollCallStatusEnum.ON_WORK,
+                        roll_call_history
+                    )
+                )
+                if len(on_work_roll_call) > 0:
+                    on_work_time = on_work_roll_call[0].created_at
+            if on_work_time and leave_work_time:
+                difference: datetime.timedelta = leave_work_time - on_work_time
+                work_duration = round(difference.seconds / 3600)
+
+            result[current_date.strftime('%Y-%m-%d')] = {
+                'status': date_roll_call.status,
+                'note': date_roll_call.note,
+                'on-work': on_work_time,
+                'leave-work': leave_work_time,
+                'work-duration': work_duration
+            }
         current_date += timedelta(days=1)
 
     sickness_roll_calls = filter(
@@ -121,7 +158,10 @@ async def get_employee_roll_call_history(
             if current_date_str in result:
                 result[current_date_str] = {
                     'status': RollCallStatusEnum.SICK,
-                    'note': roll_call.note
+                    'note': roll_call.note,
+                    'on-work': None,
+                    'leave-work': None,
+                    'work-duration': None
                 }
             current_date += timedelta(days=1)
 

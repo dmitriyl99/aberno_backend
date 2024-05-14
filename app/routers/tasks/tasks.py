@@ -69,7 +69,7 @@ async def get_my_tasks(
     }
 
 
-@router.get('created-by-me')
+@router.get('/created-by-me')
 async def get_created_by_me(
         get_tasks_use_case: Annotated[GetTasksUseCase, Depends(GetTasksUseCase)],
         get_current_employee_task: Annotated[GetCurrentEmployeeTask, Depends(GetCurrentEmployeeTask)],

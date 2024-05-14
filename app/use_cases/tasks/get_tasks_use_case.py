@@ -27,6 +27,7 @@ class GetTasksUseCase:
                 priority: str | None,
                 deadline: date | None,
                 search: str | None,
+                created_by_id: int | None,
                 page: int = 1,
                 per_page: int = 10
                 ):
@@ -49,6 +50,8 @@ class GetTasksUseCase:
                 query = query.filter(Task.priority == priority)
             if deadline and deadline != 0:
                 query = query.filter(Task.deadline == deadline)
+            if created_by_id:
+                query = query.filter(Task.created_by_id == created_by_id)
             if search:
                 query = query.filter(
                     or_(Task.title.ilike(f'%{search}%'), Task.description.ilike(f'%{search}%'))

@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from fastapi import Depends, HTTPException
-from sqlalchemy import and_, cast, Date
+from sqlalchemy import and_, cast, Date, or_
 from sqlalchemy.orm import sessionmaker
 import geopy.distance
 from starlette import status
@@ -84,8 +84,11 @@ class CreateRollCallUseCase:
                 today_on_work_roll_call = session.query(RollCall).filter(
                     and_(
                         RollCall.employee_id == employee.id,
-                        RollCall.status == RollCallStatusEnum.ON_WORK.value,
-                        cast(RollCall.created_at, Date) == date.today()
+                        cast(RollCall.created_at, Date) == date.today(),
+                        or_(
+                            RollCall.status == RollCallStatusEnum.ON_WORK.value,
+                            RollCall.status == RollCallStatusEnum.LATE.value
+                        )
                     )
                 ).first()
                 if not today_on_work_roll_call:

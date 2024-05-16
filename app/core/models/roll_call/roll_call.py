@@ -11,7 +11,7 @@ class RollCall(Base, TimestampMixin):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     status: Mapped[str] = mapped_column(Enum(
-        'ON_WORK', 'OFF_DAY', 'SICK', 'REASONED', 'LEAVE_WORK', 'LATE', 'ABSENT'), name='status_enum')
+        'ON_WORK', 'OFF_DAY', 'SICK', 'REASONED', 'LEAVE_WORK', 'LATE', 'ABSENT'), name='status')
     note: Mapped[str] = mapped_column(String)
 
     employee_id: Mapped[int] = mapped_column(ForeignKey('employees.id'))

@@ -20,3 +20,4 @@ class DeleteRollCallUseCase:
             if roll_call.sick_leave:
                 session.delete(roll_call.sick_leave)
             session.delete(roll_call)
+            session.commit()

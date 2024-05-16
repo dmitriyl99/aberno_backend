@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from sqlalchemy.orm import sessionmaker, joinedload
 
 from app.core.models.roll_call.roll_call import RollCall
@@ -20,6 +20,8 @@ class DeleteRollCallUseCase:
                 joinedload(RollCall.sick_leave),
                 joinedload(RollCall.location),
             ).get(roll_call_id)
+            if not roll_call:
+                raise HTTPException(status_code=404, detail="Roll call not found")
             if roll_call.sick_leave:
                 session.delete(roll_call.sick_leave)
             if roll_call.location:

@@ -16,8 +16,13 @@ class DeleteRollCallUseCase:
 
     def execute(self, roll_call_id: int) -> None:
         with self.session() as session:
-            roll_call: RollCall = session.query(RollCall).options(joinedload(RollCall.sick_leave)).get(roll_call_id)
+            roll_call: RollCall = session.query(RollCall).options(
+                joinedload(RollCall.sick_leave),
+                joinedload(RollCall.location),
+            ).get(roll_call_id)
             if roll_call.sick_leave:
                 session.delete(roll_call.sick_leave)
+            if roll_call.location:
+                session.delete(roll_call.location)
             session.delete(roll_call)
             session.commit()

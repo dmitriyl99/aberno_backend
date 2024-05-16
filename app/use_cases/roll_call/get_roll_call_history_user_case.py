@@ -22,7 +22,8 @@ class GetRollCallHistoryUseCase:
         employee = self.get_current_employee_task.run(user)
         with self.session() as session:
             query = session.query(RollCall).options(
-                joinedload(RollCall.sick_leave)
+                joinedload(RollCall.sick_leave),
+                joinedload(RollCall.location)
             ).filter(
                 RollCall.organization_id == employee.organization_id
             ).order_by(RollCall.created_at.desc())

@@ -96,6 +96,18 @@ class CreateRollCallUseCase:
                         status_code=status.HTTP_400_BAD_REQUEST,
                         detail="There is no record about on work today"
                     )
+                today_leave_roll_call = session.query(RollCall).filter(
+                    and_(
+                        RollCall.employee_id == employee.id,
+                        cast(RollCall.created_at, Date) == date.today(),
+                        RollCall.status == RollCallStatusEnum.LEAVE_WORK.value
+                    )
+                ).first()
+                if today_leave_roll_call:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="There is record about on leave work today"
+                    )
 
         roll_call_location: Location | None = None
         sick_leave: SickLeave | None = None

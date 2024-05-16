@@ -40,12 +40,19 @@ class RollCallSickLeaveResponse(BaseModel):
     note: str | None = None
 
 
+class RollCallLeaveWorkResponse(BaseModel):
+    leave_time: datetime
+    leave_note: str | None = None
+    leave_with_location: bool | None = None
+
+
 class RollCallResponse(BaseModel):
     id: int
     status: RollCallStatusEnum
     note: str | None = None
     location: RollCallLocation | None = None
     sick_leave: RollCallSickLeaveResponse | None = None
+    leave_work: RollCallLeaveWorkResponse | None = None
     created_at: datetime
     updated_at: datetime
 

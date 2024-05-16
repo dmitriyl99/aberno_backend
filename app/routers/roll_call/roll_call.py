@@ -1,15 +1,19 @@
 from typing import Annotated, List
+from collections import defaultdict
 from datetime import date, timedelta
 import calendar
+import geopy.distance
 
 from fastapi import APIRouter, Depends, status, HTTPException
 
-from .view_models import RollCallViewModel, RollCallResponse, RollCallSickLeaveResponse, RollCallStatusEnum
+from .view_models import RollCallViewModel, RollCallResponse, RollCallLeaveWorkResponse, RollCallStatusEnum
 
 from app.core.facades.auth import Auth
 from app.dependencies import verify_authenticated_user
 from app.use_cases.roll_call.create_roll_call_use_case import CreateRollCallUseCase
-from ...use_cases.roll_call.get_roll_call_history_user_case import GetRollCallHistoryUseCase
+from app.use_cases.roll_call.get_roll_call_history_user_case import GetRollCallHistoryUseCase
+from ...core.models.roll_call.roll_call import RollCall
+from ...tasks.organization.get_current_employee_task import GetCurrentEmployeeTask
 
 router = APIRouter(prefix='/roll-call', tags=['roll-call'], dependencies=[Depends(verify_authenticated_user)])
 
@@ -28,13 +32,56 @@ async def create_roll_call(
 @router.get("/history/", status_code=status.HTTP_200_OK, response_model=List[RollCallResponse])
 async def get_roll_call_history(
         get_roll_call_history_use_case: Annotated[GetRollCallHistoryUseCase, Depends(GetRollCallHistoryUseCase)],
+        get_current_employee_task: Annotated[GetCurrentEmployeeTask, Depends(GetCurrentEmployeeTask)],
         date_from: date | None = None,
         date_to: date | None = None
 ):
     user = Auth.get_current_user()
+    current_employee = get_current_employee_task.run(user)
     roll_call_history = get_roll_call_history_use_case.execute(user, date_from, date_to)
 
-    return list(map(lambda roll_call: RollCallResponse.from_model(roll_call), roll_call_history))
+    result = []
+
+    groups = defaultdict(list)
+    for roll_call_item in roll_call_history:
+        groups[roll_call_item.created_at.date().strftime("%Y-%m-%d")].append(roll_call_item)
+    for key in groups.keys():
+        if len(groups[key]) > 1:
+            try:
+                on_work_roll_call = list(filter(
+                    lambda rci: rci.status in [RollCallStatusEnum.ON_WORK, RollCallStatusEnum.LATE], groups[key]
+                ))[0]
+                response_model = RollCallResponse.from_model(on_work_roll_call)
+                leave_work_roll_call_list = list(filter(
+                    lambda rci: rci.status == RollCallStatusEnum.ON_WORK, groups[key]
+                ))
+                if len(leave_work_roll_call_list) == 0:
+                    continue
+                leave_work_roll_call: RollCall = leave_work_roll_call_list[0]
+                response_model.leave_work = RollCallLeaveWorkResponse(
+                    leave_time=leave_work_roll_call.created_at,
+                    leave_note=leave_work_roll_call.note,
+                    leave_with_location=False
+                )
+                if leave_work_roll_call.location and current_employee.organization.settings \
+                        and current_employee.organization.settings.roll_call_distance and (
+                        current_employee.organization.location_lat and current_employee.organization.location_lng):
+                    distance = geopy.distance.geodesic(
+                        (current_employee.organization.location_lat, current_employee.organization.location_lng),
+                        (leave_work_roll_call.location.lat, leave_work_roll_call.location.lng)
+                    )
+                    if distance.m <= current_employee.organization.settings.roll_call_distance:
+                        response_model.leave_work.leave_with_location = True
+                result.append(response_model)
+                continue
+
+            except IndexError:
+                for rc in groups[key]:
+                    result.append(RollCallResponse.from_model(rc))
+                continue
+        result.append(RollCallResponse.from_model(groups[key][0]))
+
+    return result
 
 
 @router.get("/calendar/status/", status_code=status.HTTP_200_OK)
@@ -84,4 +131,3 @@ async def get_roll_call_calendar_status(
             current_date += timedelta(days=1)
 
     return result
-

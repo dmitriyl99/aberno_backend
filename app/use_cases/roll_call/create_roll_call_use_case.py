@@ -71,6 +71,7 @@ class CreateRollCallUseCase:
                 today_roll_call = session.query(RollCall).filter(
                     and_(
                         RollCall.employee_id == employee.id,
+                        RollCall.organization_id == employee.organization_id,
                         cast(RollCall.created_at, Date) == date.today()
                     )
                 ).first()

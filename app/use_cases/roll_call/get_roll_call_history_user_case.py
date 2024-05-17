@@ -2,6 +2,7 @@ from typing import Annotated, List, Type
 from datetime import date, datetime
 
 from fastapi import Depends
+from sqlalchemy import and_
 from sqlalchemy.orm import sessionmaker, joinedload
 
 from app.dal import get_session
@@ -24,8 +25,9 @@ class GetRollCallHistoryUseCase:
             query = session.query(RollCall).options(
                 joinedload(RollCall.sick_leave),
                 joinedload(RollCall.location)
-            ).filter(
-                RollCall.organization_id == employee.organization_id
+            ).filter(and_(
+                RollCall.organization_id == employee.organization_id,
+                RollCall.employee_id == employee.id)
             ).order_by(RollCall.created_at.desc())
 
             if user:

@@ -53,7 +53,7 @@ async def get_roll_call_history(
                 ))[0]
                 response_model = RollCallResponse.from_model(on_work_roll_call)
                 leave_work_roll_call_list = list(filter(
-                    lambda rci: rci.status == RollCallStatusEnum.ON_WORK, groups[key]
+                    lambda rci: rci.status == RollCallStatusEnum.LEAVE_WORK, groups[key]
                 ))
                 if len(leave_work_roll_call_list) == 0:
                     continue

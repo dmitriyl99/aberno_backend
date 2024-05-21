@@ -137,7 +137,7 @@ async def get_employee_roll_call_history(
                     on_work_time = on_work_roll_call[0].created_at
             if on_work_time and leave_work_time:
                 difference: datetime.timedelta = leave_work_time - on_work_time
-                work_duration = round(difference.seconds / 3600)
+                work_duration = round(difference.seconds / 60)
 
             result[current_date.strftime('%Y-%m-%d')] = {
                 'status': date_roll_call.status,

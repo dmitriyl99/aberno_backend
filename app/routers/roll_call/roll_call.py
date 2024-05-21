@@ -56,6 +56,7 @@ async def get_roll_call_history(
                     lambda rci: rci.status == RollCallStatusEnum.LEAVE_WORK, groups[key]
                 ))
                 if len(leave_work_roll_call_list) == 0:
+                    result.append(response_model)
                     continue
                 leave_work_roll_call: RollCall = leave_work_roll_call_list[0]
                 response_model.leave_work = RollCallLeaveWorkResponse(
@@ -116,6 +117,15 @@ async def get_roll_call_calendar_status(
         date_roll_call = None
         if len(filtered_roll_calls) > 0:
             date_roll_call = filtered_roll_calls[0]
+        if date_roll_call.status == RollCallStatusEnum.LEAVE_WORK:
+            on_work_roll_call = list(
+                filter(
+                    lambda r: r.created_at.date() == current_date and r.status in
+                              [RollCallStatusEnum.ON_WORK, RollCallStatusEnum.LATE],
+                    roll_call_history
+            ))
+            if len(on_work_roll_call) > 0:
+                date_roll_call.status = on_work_roll_call[0].status
         result[current_date.strftime('%Y-%m-%d')] = date_roll_call.status if date_roll_call else None
         current_date += timedelta(days=1)
 

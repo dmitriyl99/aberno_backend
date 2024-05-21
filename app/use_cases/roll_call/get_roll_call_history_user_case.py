@@ -30,11 +30,6 @@ class GetRollCallHistoryUseCase:
                 RollCall.employee_id == employee.id)
             ).order_by(RollCall.created_at.desc())
 
-            if user:
-                query = query.filter(
-                    RollCall.employee_id == employee.id
-                )
-
             if date_from:
                 query = query.filter(RollCall.created_at >= date_from)
             if date_to:

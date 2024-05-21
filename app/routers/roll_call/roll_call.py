@@ -117,7 +117,7 @@ async def get_roll_call_calendar_status(
         date_roll_call = None
         if len(filtered_roll_calls) > 0:
             date_roll_call = filtered_roll_calls[0]
-        if date_roll_call.status == RollCallStatusEnum.LEAVE_WORK:
+        if date_roll_call and date_roll_call.status == RollCallStatusEnum.LEAVE_WORK:
             on_work_roll_call = list(
                 filter(
                     lambda r: r.created_at.date() == current_date and r.status in

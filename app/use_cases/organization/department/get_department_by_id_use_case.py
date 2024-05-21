@@ -26,6 +26,6 @@ class GetDepartmentByIdUseCase:
                 current_employee: Type[Employee] = session.query(Employee).filter(
                     Employee.user_id == current_user.id
                 ).first()
-                if department.organization_id != current_employee.department_id:
+                if department.organization_id != current_employee.organization_id:
                     return None
         return department

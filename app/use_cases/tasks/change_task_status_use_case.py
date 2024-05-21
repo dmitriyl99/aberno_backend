@@ -24,10 +24,13 @@ class ChangeTaskStatusUseCase:
             session.refresh(task)
             session.refresh(task.created_by)
 
-            self.send_notification_task.run(
-                f"Задача {task.title} выполнена",
-                "Нажмите, чтобы посмотреть",
-                task.created_by.user_id
-            )
+            try:
+                self.send_notification_task.run(
+                    f"Задача {task.title} выполнена",
+                    "Нажмите, чтобы посмотреть",
+                    task.executor.user_id
+                )
+            except Exception:
+                pass
 
         return task

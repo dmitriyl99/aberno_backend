@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Annotated
 
 from sqlalchemy.orm import sessionmaker, joinedload
@@ -32,6 +33,7 @@ class GetTaskByIdUseCase:
 
             if task.executor_id == current_employee.id and not task.viewed:
                 task.viewed = True
+                task.viewed_at = datetime.now()
                 session.commit()
                 session.refresh(task)
             return task

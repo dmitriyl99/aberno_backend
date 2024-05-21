@@ -31,6 +31,7 @@ class Task(Base, TimestampMixin):
     priority: Mapped[str] = mapped_column(String(50))
     deadline: Mapped[datetime] = mapped_column(DateTime)
     viewed: Mapped[bool] = mapped_column(Boolean(), default=False)
+    viewed_at: Mapped[datetime] = mapped_column(DateTime, default=None)
 
     department_id: Mapped[int] = mapped_column(ForeignKey('departments.id'))
     executor_id: Mapped[str] = mapped_column(ForeignKey('employees.id'))

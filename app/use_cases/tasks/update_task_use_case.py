@@ -45,10 +45,13 @@ class UpdateTaskUseCase:
             session.refresh(task.created_by)
 
             if task.executor and new_executor:
-                self.send_notification_task.run(
-                    f"Вам назначена задача {task.title}",
-                    "Нажмите, чтобы посмотреть",
-                    task.executor.user_id
-                )
+                try:
+                    self.send_notification_task.run(
+                        f"Вам назначена задача {task.title}",
+                        "Нажмите, чтобы посмотреть",
+                        task.executor.user_id
+                    )
+                except Exception:
+                    pass
 
             return task

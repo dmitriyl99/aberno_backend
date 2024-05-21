@@ -129,12 +129,14 @@ async def get_employee_roll_call_history(
                 leave_work_time = date_roll_call.created_at
                 on_work_roll_call = list(
                     filter(
-                        lambda rch: rch.created_at.date() == current_date and rch.status == RollCallStatusEnum.ON_WORK,
+                        lambda rch: rch.created_at.date() == current_date and rch.status in [RollCallStatusEnum.ON_WORK,
+                                                                                             RollCallStatusEnum.LATE],
                         roll_call_history
                     )
                 )
                 if len(on_work_roll_call) > 0:
                     on_work_time = on_work_roll_call[0].created_at
+                    date_roll_call.status = on_work_roll_call[0].status
             if on_work_time and leave_work_time:
                 difference: datetime.timedelta = leave_work_time - on_work_time
                 work_duration = round(difference.seconds / 60)

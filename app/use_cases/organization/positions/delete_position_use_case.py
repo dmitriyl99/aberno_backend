@@ -22,7 +22,7 @@ class DeletePositionUseCase:
     def execute(self, id: int):
         current_user = Auth.get_current_user()
         current_employee = self.get_current_employee_task.run(current_user)
-        if not current_user.is_super_admin or not current_user.is_admin:
+        if not (current_user.is_super_admin or current_user.is_admin):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="You do not have permission to perform this"

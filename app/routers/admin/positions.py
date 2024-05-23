@@ -21,7 +21,7 @@ def get_positions(
         organization_id: int | None = None
 ):
     return list(
-        map(lambda position: PositionViewModel.from_orm(position), get_positions_use_case.execute(organization_id))
+        map(lambda position: PositionViewModel.from_model(position), get_positions_use_case.execute(organization_id))
     )
 
 
@@ -31,7 +31,7 @@ def create_position(
         data: CreatePositionViewModel
 ):
     position = create_position_use_case.execute(data.name, data.organization_id)
-    return PositionViewModel.from_orm(position)
+    return PositionViewModel.from_model(position)
 
 
 @router.put('/{id}', response_model=PositionViewModel)
@@ -41,7 +41,7 @@ def update_position(
         data: CreatePositionViewModel,
 ):
     position = update_position_use_case.execute(id, data.name)
-    return PositionViewModel.from_orm(position)
+    return PositionViewModel.from_model(position)
 
 
 @router.delete('/{id}', status_code=status.HTTP_204_NO_CONTENT)

@@ -44,7 +44,7 @@ def update_position(
     return PositionViewModel.from_orm(position)
 
 
-@router.delete('/{id}', response_model=PositionViewModel, status_code=status.HTTP_204_NO_CONTENT)
+@router.delete('/{id}', status_code=status.HTTP_204_NO_CONTENT)
 def delete_position(
         delete_position_use_case: Annotated[DeletePositionUseCase, Depends(DeletePositionUseCase)],
         id: int

@@ -18,7 +18,8 @@ class GetCurrentEmployeeTask:
         with self.session() as session:
             employee: Type[Employee] = session.query(Employee).filter(Employee.user_id == user.id).options(
                 joinedload(Employee.organization).joinedload(Organization.settings),
-                joinedload(Employee.department), joinedload(Employee.user)
+                joinedload(Employee.department), joinedload(Employee.user),
+                joinedload(Employee.position)
             ).first()
 
         return employee

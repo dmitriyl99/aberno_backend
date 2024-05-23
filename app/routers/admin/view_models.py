@@ -5,6 +5,7 @@ from typing import List, Any
 from pydantic import BaseModel
 
 from app.core.models.organization import Organization, Department, Employee
+from app.core.models.organization.position import Position
 from app.routers.auth.view_models import CurrentUserViewModel
 
 
@@ -100,12 +101,29 @@ class CreatedByViewModel(BaseModel):
     last_name: str | None
 
 
+class PositionViewModel(BaseModel):
+    id: int
+    name: str
+
+    @staticmethod
+    def from_model(model: Position):
+        return PositionViewModel(
+            id=model.id,
+            name=model.name
+        )
+
+
+class CreatePositionViewModel(BaseModel):
+    name: str
+    organization_id: int
+
+
 class EmployeeResponse(BaseModel):
     id: int
     phone: str
     user: CurrentUserViewModel | None = None
     department: DepartmentResponse | None = None
-    position: str | None = None
+    position: PositionViewModel | None = None
     created_by: CurrentUserViewModel | None = None
 
     created_at: datetime
@@ -116,7 +134,6 @@ class EmployeeResponse(BaseModel):
         response = EmployeeResponse(
             id=model.id,
             phone=model.phone,
-            position=model.position,
             created_at=model.created_at,
             updated_at=model.updated_at
         )
@@ -124,6 +141,8 @@ class EmployeeResponse(BaseModel):
             response.department = DepartmentResponse.from_model(model.department)
         if 'user' in model.__dict__:
             response.user = CurrentUserViewModel.from_model(model.user)
+        if 'position' in model.__dict__:
+            response.position = PositionViewModel.from_model(model.position)
         if 'created_by' in model.__dict__ and model.created_by is not None:
             response.created_by = CreatedByViewModel(
                 id=model.created_by.id,

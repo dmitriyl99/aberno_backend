@@ -21,6 +21,7 @@ from .view_models import CreateEmployeeViewModel, EmployeeResponse, ChangeRoleVi
 from ..roll_call.view_models import RollCallStatusEnum
 from ...core.models.roll_call.roll_call import RollCall
 from ...use_cases.organization.employee.change_employee_role_use_case import ChangeEmployeeRoleUseCase
+from ...use_cases.organization.employee.get_admins_use_case import GetAdminsUseCase
 from ...use_cases.roll_call.get_roll_call_history_user_case import GetRollCallHistoryUseCase
 
 router = APIRouter(prefix='/employees', tags=['admin-employees'])
@@ -41,6 +42,30 @@ async def get_employees(
         'data': list(
             map(lambda employee: EmployeeResponse.from_model(employee), employees)
         )
+    }
+
+
+@router.get('/admins', status_code=status.HTTP_200_OK)
+async def get_admins(
+        get_admins_use_case: Annotated[GetAdminsUseCase, Depends(GetAdminsUseCase)],
+        search: str | None = None,
+        organization_id: int | None = None,
+        department_id: int | None = None,
+        page: int = 1,
+        per_page: int = 10
+):
+    employees, count = get_admins_use_case.execute(
+        Auth.get_current_user(),
+        search,
+        organization_id,
+        department_id,
+        page,
+        per_page
+    )
+
+    return {
+        'count': count,
+        'data': list(map(lambda employee: EmployeeResponse.from_model(employee), employees))
     }
 
 

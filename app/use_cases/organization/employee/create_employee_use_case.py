@@ -1,3 +1,4 @@
+import re
 from typing import Annotated
 
 from sqlalchemy.orm import sessionmaker
@@ -67,8 +68,11 @@ class CreateEmployeeUseCase:
                     organization_id = current_employee.organization_id
             if not organization_id:
                 organization_id = current_employee.organization_id
+            phone = data.phone
+            if phone.startswith('+'):
+                phone = phone[1:]
             employee = Employee(
-                phone=data.phone,
+                phone=phone,
                 position_id=data.position_id,
                 user_id=user.id,
                 department_id=data.department_id,

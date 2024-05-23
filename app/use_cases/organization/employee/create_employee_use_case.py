@@ -69,7 +69,7 @@ class CreateEmployeeUseCase:
                 organization_id = current_employee.organization_id
             employee = Employee(
                 phone=data.phone,
-                position=data.position,
+                position_id=data.position_id,
                 user_id=user.id,
                 department_id=data.department_id,
                 organization_id=organization_id,
@@ -79,4 +79,5 @@ class CreateEmployeeUseCase:
             session.commit()
             session.refresh(employee.user)
             session.refresh(employee.department)
+            session.refresh(employee.position)
         return employee

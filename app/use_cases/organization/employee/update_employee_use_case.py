@@ -52,6 +52,7 @@ class UpdateEmployeeUseCase:
             if user is None:
                 return None
             employee.department_id = data.department_id
+            employee.position_id = data.position_id
             employee.birth_date = data.birth_date
             employee.phone = data.phone
             user.name = data.name
@@ -63,4 +64,5 @@ class UpdateEmployeeUseCase:
             session.refresh(employee)
             session.refresh(employee.user)
             session.refresh(employee.department)
+            session.refresh(employee.position)
         return employee

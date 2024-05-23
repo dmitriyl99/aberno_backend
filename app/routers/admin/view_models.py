@@ -58,7 +58,7 @@ class CreateEmployeeViewModel(BaseModel):
     password: str | None = None
     password_confirmation: str | None = None
 
-    position: str
+    position_id: int | None = None
     phone: str
     department_id: int
     organization_id: int | None = None

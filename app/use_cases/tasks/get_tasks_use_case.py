@@ -5,6 +5,7 @@ from sqlalchemy import or_
 from sqlalchemy.orm import sessionmaker, joinedload
 from fastapi import Depends
 
+from app.core.models.auth import User
 from app.core.models.organization import Employee
 from app.dal import get_session
 from app.core.models.tasks import Task
@@ -54,7 +55,10 @@ class GetTasksUseCase:
                 query = query.filter(Task.created_by_id == created_by_id)
             if search:
                 query = query.filter(
-                    or_(Task.title.ilike(f'%{search}%'), Task.description.ilike(f'%{search}%'))
+                    or_(Task.title.ilike(f'%{search}%'), Task.description.ilike(f'%{search}%'),
+                        Task.created_by.has(Employee.user.has(User.name.ilike(f'f%{search}%'))),
+                        Task.executor.has(Employee.user.has(User.name.ilike(f'%{search}%')))
+                        )
                 )
             query = query.order_by(Task.created_at.desc())
             count = query.count()

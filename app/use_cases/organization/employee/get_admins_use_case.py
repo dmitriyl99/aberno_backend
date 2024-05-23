@@ -43,7 +43,7 @@ class GetAdminsUseCase:
                 joinedload(Employee.user).joinedload(User.roles),
                 joinedload(Employee.department),
                 joinedload(Employee.created_by)
-            ).filter(Role.name == 'Admin')
+            ).filter(Employee.user.has(User.roles.any(Role.name == 'Admin')))
             if search:
                 query = query.filter(or_(
                     User.name.ilike(f"%{search}%"),

@@ -9,7 +9,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 class RollCallStatusEnum(str, Enum):
     ON_WORK = 'ON_WORK'
     OFF_DAY = 'OFF_DAY'
-    LATE = 'LATE',
+    LATE = 'LATE'
     SICK = 'SICK'
     ABSENT = 'ABSENT'
     REASONED = 'REASONED'

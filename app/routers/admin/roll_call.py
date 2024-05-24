@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 from typing import Annotated
 from collections import defaultdict
 
@@ -29,7 +29,7 @@ async def get_roll_calls(
         get_roll_call_use_case: Annotated[GetAllRollCallsUseCase, Depends(GetAllRollCallsUseCase)],
         organization_id: int | None = None,
         department_id: int | None = None,
-        filter_date: datetime | None = None,
+        filter_date: date | None = None,
         position_id: int | None = None
 ):
     roll_calls = get_roll_call_use_case.execute(

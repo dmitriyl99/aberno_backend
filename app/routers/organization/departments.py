@@ -8,8 +8,9 @@ from .view_models import DepartmentResponse
 from ...core.facades.auth import Auth
 from ...core.models.organization import Employee, Department
 from ...dal import get_session
+from ...dependencies import verify_authenticated_user
 
-router = APIRouter(prefix="/departments", tags=['departments'])
+router = APIRouter(prefix="/departments", tags=['departments'], dependencies=[Depends(verify_authenticated_user)])
 
 
 @router.get('/', status_code=status.HTTP_200_OK, response_model=List[DepartmentResponse])

@@ -39,7 +39,8 @@ class GetEmployeesUseCase:
             query = session.query(Employee).populate_existing().options(
                 joinedload(Employee.user).joinedload(User.roles),
                 joinedload(Employee.department),
-                joinedload(Employee.created_by)
+                joinedload(Employee.created_by),
+                joinedload(Employee.position)
             ).filter(
                 Employee.organization_id == current_employee.organization_id
             )

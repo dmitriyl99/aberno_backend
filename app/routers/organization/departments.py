@@ -1,20 +1,36 @@
-from typing import Annotated, List
+from typing import Annotated, List, Type
 
 from fastapi import APIRouter, Depends, status
+from sqlalchemy import or_
+from sqlalchemy.orm import sessionmaker, joinedload
 
-from app.use_cases.organization.department import (GetDepartmentsUseCase)
 from .view_models import DepartmentResponse
+from ...core.facades.auth import Auth
+from ...core.models.organization import Employee, Department
+from ...dal import get_session
 
-router = APIRouter(prefix="/departments", tags=['admin-departments'])
+router = APIRouter(prefix="/departments", tags=['departments'])
 
 
 @router.get('/', status_code=status.HTTP_200_OK, response_model=List[DepartmentResponse])
 async def get_departments(
-        get_departments_use_case: Annotated[GetDepartmentsUseCase, Depends(GetDepartmentsUseCase)],
-        organization_id: int | None = None,
+        session: Annotated[sessionmaker, Depends(get_session)],
         search: str | None = None,
 ):
-    departments = get_departments_use_case.execute(search, organization_id)
+    current_user = Auth.get_current_user()
+    with session() as session:
+        current_employee: Type[Employee] = session.query(Employee).filter(
+            Employee.user_id == current_user.id
+        ).first()
+        organization_id = current_employee.organization_id
+        query = session.query(Department).options(
+            joinedload(Department.organization)
+        )
+        if search is not None:
+            query = query.filter(or_(
+                Department.name.ilike(f"%{search}%"),
+            ))
+        departments = query.all()
 
     return list(
         map(

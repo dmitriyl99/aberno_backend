@@ -5,7 +5,7 @@ from fastapi import Depends, HTTPException
 from sqlalchemy.orm import sessionmaker, joinedload
 from starlette import status
 
-from app.core.models.organization import Employee, Organization
+from app.core.models.organization import Employee, Organization, Department
 from app.core.models.roll_call.roll_call import RollCall
 from app.dal import get_session
 from app.core.facades.auth import Auth
@@ -40,8 +40,11 @@ class GetAllRollCallsUseCase:
             organization_id = current_employee.organization_id
 
         with self.session() as session:
-            query = session.query(RollCall).options(
-                joinedload(RollCall.employee).joinedload(Employee.user),
+            query = session.query(RollCall).join(RollCall.employee).options(
+                joinedload(RollCall.employee).options(
+                    joinedload(Employee.organization).joinedload(Organization.settings),
+                    joinedload(Employee.position), joinedload(Employee.department).joinedload(Department.organization)
+                ),
                 joinedload(RollCall.location)
             )
             if organization_id:

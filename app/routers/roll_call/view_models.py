@@ -4,8 +4,96 @@ from pydantic import BaseModel
 
 from datetime import datetime, date
 
+from app.core.models.organization import Department, Organization, Employee
+from app.core.models.organization.position import Position
 from app.core.models.roll_call.roll_call import RollCall
-# from app.routers.admin.view_models import EmployeeResponse
+from app.routers.auth.view_models import CurrentUserViewModel
+
+
+class OrganizationResponse(BaseModel):
+    name: str
+    legal_name: str
+    legal_name_prefix: str
+    location_lat: float | None = None
+    location_lng: float | None = None
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
+    @staticmethod
+    def from_model(model: Organization):
+        response = OrganizationResponse(
+            id=model.id,
+            name=model.name,
+            legal_name=model.legal_name,
+            legal_name_prefix=model.legal_name_prefix,
+            location_lat=model.location_lat,
+            location_lng=model.location_lng,
+            created_at=model.created_at,
+            updated_at=model.updated_at,
+        )
+        return response
+
+
+class PositionViewModel(BaseModel):
+    id: int
+    name: str
+
+    @staticmethod
+    def from_model(model: Position):
+        return PositionViewModel(
+            id=model.id,
+            name=model.name
+        )
+
+
+class DepartmentResponse(BaseModel):
+    id: int
+    name: str
+    organization: object | None = None
+
+    created_at: datetime
+    updated_at: datetime
+
+    @staticmethod
+    def from_model(model: Department):
+        response = DepartmentResponse(
+            id=model.id,
+            name=model.name,
+            created_at=model.created_at,
+            updated_at=model.updated_at
+        )
+        if 'organization' in model.__dict__:
+            response.organization = OrganizationResponse.from_model(model.organization)
+
+        return response
+
+
+class EmployeeResponse(BaseModel):
+    id: int
+    phone: str
+    user: CurrentUserViewModel | None = None
+    department: DepartmentResponse | None = None
+    position: PositionViewModel | None = None
+
+    created_at: datetime
+    updated_at: datetime
+
+    @staticmethod
+    def from_model(model: Employee):
+        response = EmployeeResponse(
+            id=model.id,
+            phone=model.phone,
+            created_at=model.created_at,
+            updated_at=model.updated_at
+        )
+        if 'department' in model.__dict__:
+            response.department = DepartmentResponse.from_model(model.department)
+        if 'user' in model.__dict__:
+            response.user = CurrentUserViewModel.from_model(model.user)
+        if 'position' in model.__dict__:
+            response.position = PositionViewModel.from_model(model.position)
+        return response
 
 
 class RollCallStatusEnum(str, Enum):
@@ -55,7 +143,7 @@ class RollCallResponse(BaseModel):
     location: RollCallLocation | None = None
     sick_leave: RollCallSickLeaveResponse | None = None
     leave_work: RollCallLeaveWorkResponse | None = None
-    # employee: EmployeeResponse | None = None
+    employee: EmployeeResponse | None = None
     created_at: datetime
     updated_at: datetime
 
@@ -75,7 +163,7 @@ class RollCallResponse(BaseModel):
                 date_to=roll_call.sick_leave.date_to,
                 note=roll_call.sick_leave.note
             ) if roll_call.sick_leave else None
-        # if 'employee' in roll_call.__dict__:
-        #     response.employee = EmployeeResponse.from_model(roll_call.employee)
+        if 'employee' in roll_call.__dict__:
+            response.employee = EmployeeResponse.from_model(roll_call.employee)
 
         return response

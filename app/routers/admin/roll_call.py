@@ -4,13 +4,11 @@ from collections import defaultdict
 
 import geopy.distance
 
-from fastapi import APIRouter, Depends, status, HTTPException
+from fastapi import APIRouter, Depends, status
 
-from app.core.facades.auth import Auth
 from app.core.models.roll_call.roll_call import RollCall, RollCallStatusEnum
 from app.routers.roll_call.view_models import RollCallViewModel, RollCallResponse, \
     RollCallLeaveWorkResponse
-from app.tasks.organization.get_current_employee_task import GetCurrentEmployeeTask
 from app.use_cases.roll_call import UpdateRollCallUseCase, DeleteRollCallUseCase, GetAllRollCallsUseCase
 
 router = APIRouter(prefix='/roll-call', tags=['admin-roll-call'])
@@ -29,7 +27,6 @@ async def update_roll_call(
 @router.get('/')
 async def get_roll_calls(
         get_roll_call_use_case: Annotated[GetAllRollCallsUseCase, Depends(GetAllRollCallsUseCase)],
-        get_current_employee_task: Annotated[GetCurrentEmployeeTask, Depends(GetCurrentEmployeeTask)],
         organization_id: int | None = None,
         department_id: int | None = None,
         filter_date: datetime | None = None,

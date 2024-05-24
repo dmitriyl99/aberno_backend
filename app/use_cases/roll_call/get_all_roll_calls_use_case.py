@@ -41,10 +41,7 @@ class GetAllRollCallsUseCase:
 
         with self.session() as session:
             query = session.query(RollCall).options(
-                joinedload(RollCall.employee).options(
-                    joinedload(Employee.position),
-                    joinedload(Employee.organization).joinedload(Organization.settings)
-                ),
+                joinedload(RollCall.employee).joinedload(Employee.user),
                 joinedload(RollCall.location)
             )
             if organization_id:

@@ -4,6 +4,7 @@ from pydantic import BaseModel
 
 from app.core.models.organization import Employee, Department
 from app.core.models.tasks import Task, TaskStatusEnum, TaskPriorityEnum
+from app.routers.admin.view_models import PositionViewModel
 from app.routers.auth.view_models import CurrentUserViewModel
 
 
@@ -22,16 +23,17 @@ class DepartmentResponse(BaseModel):
 class EmployeeResponse(BaseModel):
     id: int
     user: CurrentUserViewModel | None = None
-    position: str | None = None
+    position: PositionViewModel | None = None
 
     @staticmethod
     def from_model(employee: Employee):
         response = EmployeeResponse(
             id=employee.id,
-            position=employee.position
         )
         if 'user' in employee.__dict__:
             response.user = CurrentUserViewModel.from_model(employee.user)
+        if 'position' in employee.__dict__:
+            response.position = PositionViewModel.from_model(employee.position)
 
         return response
 

@@ -148,7 +148,7 @@ class CreateRollCallUseCase:
                     int(roll_call_end_time_parsed[1])
                 )
                 if now > roll_call_end_time:
-                    data.status = RollCallStatusEnum.LATE
+                    data.status = RollCallStatusEnum.LATE.value
 
         elif data.status == RollCallStatusEnum.OFF_DAY:
             today = date.today()

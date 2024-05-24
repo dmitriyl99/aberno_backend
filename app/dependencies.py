@@ -42,7 +42,7 @@ async def verify_authenticated_user(
     await Auth.authorize_user(token, 'jwt', get_user_by_id_task)
 
 
-async def _verify_user_roles(user: User, roles: list) -> bool:
+def _verify_user_roles(user: User, roles: list) -> bool:
     role_filter = filter(
         lambda r: r.name in roles, user.roles
     )

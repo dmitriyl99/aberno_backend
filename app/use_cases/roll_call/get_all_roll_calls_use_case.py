@@ -43,6 +43,7 @@ class GetAllRollCallsUseCase:
             query = session.query(RollCall).join(RollCall.employee).options(
                 joinedload(RollCall.employee).options(
                     joinedload(Employee.organization).joinedload(Organization.settings),
+                    joinedload(Employee.user),
                     joinedload(Employee.position), joinedload(Employee.department).joinedload(Department.organization)
                 ),
                 joinedload(RollCall.location)

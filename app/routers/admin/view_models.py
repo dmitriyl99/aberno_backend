@@ -141,7 +141,7 @@ class EmployeeResponse(BaseModel):
             response.department = DepartmentResponse.from_model(model.department)
         if 'user' in model.__dict__:
             response.user = CurrentUserViewModel.from_model(model.user)
-        if 'position' in model.__dict__:
+        if 'position' in model.__dict__ and model.position:
             response.position = PositionViewModel.from_model(model.position)
         if 'created_by' in model.__dict__ and model.created_by is not None:
             response.created_by = CreatedByViewModel(

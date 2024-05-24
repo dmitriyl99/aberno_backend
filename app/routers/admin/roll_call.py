@@ -30,7 +30,9 @@ async def get_roll_calls(
         organization_id: int | None = None,
         department_id: int | None = None,
         filter_date: date | None = None,
-        position_id: int | None = None
+        position_id: int | None = None,
+        page: int = 1,
+        per_page: int = 10,
 ):
     roll_calls = get_roll_call_use_case.execute(
         organization_id,
@@ -89,8 +91,12 @@ async def get_roll_calls(
                         result.append(RollCallResponse.from_model(rc))
                     continue
             result.append(RollCallResponse.from_model(groups[key][0]))
+    pages = [result[i:i+per_page] for i in range(0, len(result), per_page)]
 
-    return result
+    return {
+        'count': len(result),
+        'data': pages[page - 1] if len(pages) > 0 else []
+    }
 
 
 @router.delete('/{roll_call_id}', status_code=status.HTTP_204_NO_CONTENT)

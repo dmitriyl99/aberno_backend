@@ -57,5 +57,5 @@ class GetAllRollCallsUseCase:
                 query = query.filter(RollCall.employee.has(Employee.position_id == position_id))
             if filter_date:
                 query = query.filter(func.date(RollCall.created_at) == filter_date)
-            return query.all()
+            return query.order_by(RollCall.created_at.desc()).all()
 

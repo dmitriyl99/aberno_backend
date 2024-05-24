@@ -31,10 +31,11 @@ async def get_employees(
         get_employees_use_case: Annotated[GetEmployeesUseCase, Depends(GetEmployeesUseCase)],
         search: str | None = None,
         department_id: int | None = None,
+        status: str | None = None,
         page: int = 1,
         per_page: int = 10
 ):
-    employees, count = get_employees_use_case.execute(Auth.get_current_user(), search, department_id, page, per_page)
+    employees, count = get_employees_use_case.execute(Auth.get_current_user(), search, department_id, status, page, per_page)
 
     return {
         'count': count,
@@ -50,6 +51,7 @@ async def get_admins(
         search: str | None = None,
         organization_id: int | None = None,
         department_id: int | None = None,
+        role: str | None = None,
         page: int = 1,
         per_page: int = 10
 ):
@@ -58,6 +60,7 @@ async def get_admins(
         search,
         organization_id,
         department_id,
+        role,
         page,
         per_page
     )

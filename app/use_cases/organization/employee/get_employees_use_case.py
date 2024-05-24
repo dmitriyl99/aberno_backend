@@ -24,6 +24,7 @@ class GetEmployeesUseCase:
             user: User,
             search: str | None = None,
             department_id: int | None = None,
+            employee_status: str | None = None,
             page: int = 1,
             per_page: int = 10
     ) -> Tuple[List[Type[Employee]], int]:
@@ -49,4 +50,7 @@ class GetEmployeesUseCase:
                 ))
             if department_id is not None:
                 query = query.filter(Employee.department_id == department_id)
+            if employee_status:
+                is_active_filter = employee_status == 'active'
+                query = query.filter(Employee.user.has(User.is_active == is_active_filter))
             return query.order_by(Employee.created_at.desc()).limit(per_page).offset((page - 1) * per_page).all(), query.count()

@@ -25,6 +25,7 @@ class GetAdminsUseCase:
             search: str | None = None,
             organization_id: int | None = None,
             department_id: int | None = None,
+            role: str | None = None,
             page: int = 1,
             per_page: int = 10
     ) -> Tuple[List[Type[Employee]], int]:
@@ -38,12 +39,15 @@ class GetAdminsUseCase:
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail='You do not have permission to perform this'
             )
+        roles = ['Admin', 'Super Admin']
+        if role:
+            roles = [role]
         with self.session() as session:
             query = session.query(Employee).populate_existing().options(
                 joinedload(Employee.user).joinedload(User.roles),
                 joinedload(Employee.department),
                 joinedload(Employee.created_by)
-            ).filter(Employee.user.has(User.roles.any(Role.name.in_(['Admin', 'Super Admin']))))
+            ).filter(Employee.user.has(User.roles.any(Role.name.in_(roles))))
             if search:
                 query = query.filter(or_(
                     User.name.ilike(f"%{search}%"),

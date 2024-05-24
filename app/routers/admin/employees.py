@@ -141,7 +141,7 @@ async def get_employee_roll_call_history(
             on_work_time = None
             leave_work_time = None
             work_duration = None
-            if date_roll_call.status == RollCallStatusEnum.ON_WORK:
+            if date_roll_call.status == RollCallStatusEnum.ON_WORK.value:
                 on_work_time = date_roll_call.created_at
                 leave_work_roll_call = list(
                     filter(
@@ -152,12 +152,12 @@ async def get_employee_roll_call_history(
                 )
                 if len(leave_work_roll_call) > 0:
                     leave_work_time = leave_work_roll_call[0].created_at
-            if date_roll_call.status == RollCallStatusEnum.LEAVE_WORK:
+            if date_roll_call.status == RollCallStatusEnum.LEAVE_WORK.value:
                 leave_work_time = date_roll_call.created_at
                 on_work_roll_call = list(
                     filter(
-                        lambda rch: rch.created_at.date() == current_date and rch.status in [RollCallStatusEnum.ON_WORK,
-                                                                                             RollCallStatusEnum.LATE],
+                        lambda rch: rch.created_at.date() == current_date and rch.status in [RollCallStatusEnum.ON_WORK.value,
+                                                                                             RollCallStatusEnum.LATE.value],
                         roll_call_history
                     )
                 )

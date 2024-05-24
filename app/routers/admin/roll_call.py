@@ -53,8 +53,8 @@ async def get_roll_calls(
             if len(groups[key]) > 1:
                 try:
                     on_work_roll_call = list(filter(
-                        lambda rci: rci.status in [RollCallStatusEnum.ON_WORK,
-                                                   RollCallStatusEnum.LATE] and rci.employee_id == employee_id,
+                        lambda rci: rci.status in [RollCallStatusEnum.ON_WORK.value,
+                                                   RollCallStatusEnum.LATE.value] and rci.employee_id == employee_id,
                         groups[key]
                     ))[0]
                     current_employee = on_work_roll_call.employee

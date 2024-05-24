@@ -49,7 +49,7 @@ async def get_roll_call_history(
         if len(groups[key]) > 1:
             try:
                 on_work_roll_call = list(filter(
-                    lambda rci: rci.status in [RollCallStatusEnum.ON_WORK, RollCallStatusEnum.LATE], groups[key]
+                    lambda rci: rci.status in [RollCallStatusEnum.ON_WORK.value, RollCallStatusEnum.LATE.value], groups[key]
                 ))[0]
                 response_model = RollCallResponse.from_model(on_work_roll_call)
                 leave_work_roll_call_list = list(filter(
@@ -121,7 +121,7 @@ async def get_roll_call_calendar_status(
             on_work_roll_call = list(
                 filter(
                     lambda r: r.created_at.date() == current_date and r.status in
-                              [RollCallStatusEnum.ON_WORK, RollCallStatusEnum.LATE],
+                              [RollCallStatusEnum.ON_WORK.value, RollCallStatusEnum.LATE.value],
                     roll_call_history
             ))
             if len(on_work_roll_call) > 0:

@@ -2,11 +2,13 @@ from .location import Location
 from .sick_leave import SickLeave
 from .. import Base, TimestampMixin
 
+from enum import Enum as NativeEnum
+
 from sqlalchemy import Enum, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
-class RollCallStatusEnum(str, Enum):
+class RollCallStatusEnum(str, NativeEnum):
     ON_WORK = 'ON_WORK'
     OFF_DAY = 'OFF_DAY'
     LATE = 'LATE'

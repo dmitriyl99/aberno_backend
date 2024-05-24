@@ -12,8 +12,8 @@ from app.core.models.organization.schedule import ScheduleDay
 from app.core.models.roll_call.sick_leave import SickLeave
 from app.dal import get_session
 from app.routers.admin.view_models import ScheduleDayEnum
-from app.routers.roll_call.view_models import RollCallViewModel, RollCallStatusEnum
-from app.core.models.roll_call.roll_call import RollCall, Location
+from app.routers.roll_call.view_models import RollCallViewModel
+from app.core.models.roll_call.roll_call import RollCall, Location, RollCallStatusEnum
 from app.core.models.auth import User
 from app.tasks.organization.get_current_employee_task import GetCurrentEmployeeTask
 from app.tasks.organization.get_organization_by_id_task import GetOrganizationByIdTask

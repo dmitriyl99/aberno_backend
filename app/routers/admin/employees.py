@@ -18,8 +18,7 @@ from app.use_cases.organization.employee import (
 from app.core.facades.auth import Auth
 
 from .view_models import CreateEmployeeViewModel, EmployeeResponse, ChangeRoleViewModel
-from ..roll_call.view_models import RollCallStatusEnum
-from ...core.models.roll_call.roll_call import RollCall
+from ...core.models.roll_call.roll_call import RollCall, RollCallStatusEnum
 from ...use_cases.organization.employee.change_employee_role_use_case import ChangeEmployeeRoleUseCase
 from ...use_cases.organization.employee.get_admins_use_case import GetAdminsUseCase
 from ...use_cases.roll_call.get_roll_call_history_user_case import GetRollCallHistoryUseCase

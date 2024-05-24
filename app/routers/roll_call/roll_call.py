@@ -6,13 +6,13 @@ import geopy.distance
 
 from fastapi import APIRouter, Depends, status, HTTPException
 
-from .view_models import RollCallViewModel, RollCallResponse, RollCallLeaveWorkResponse, RollCallStatusEnum
+from .view_models import RollCallViewModel, RollCallResponse, RollCallLeaveWorkResponse
 
 from app.core.facades.auth import Auth
 from app.dependencies import verify_authenticated_user
 from app.use_cases.roll_call.create_roll_call_use_case import CreateRollCallUseCase
 from app.use_cases.roll_call.get_roll_call_history_user_case import GetRollCallHistoryUseCase
-from ...core.models.roll_call.roll_call import RollCall
+from ...core.models.roll_call.roll_call import RollCall, RollCallStatusEnum
 from ...tasks.organization.get_current_employee_task import GetCurrentEmployeeTask
 
 router = APIRouter(prefix='/roll-call', tags=['roll-call'], dependencies=[Depends(verify_authenticated_user)])

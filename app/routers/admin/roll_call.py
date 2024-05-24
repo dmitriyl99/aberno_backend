@@ -1,9 +1,16 @@
 from datetime import datetime
-from typing import Annotated, List
+from typing import Annotated
+from collections import defaultdict
+
+import geopy.distance
 
 from fastapi import APIRouter, Depends, status, HTTPException
 
-from app.routers.roll_call.view_models import RollCallViewModel, RollCallResponse
+from app.core.facades.auth import Auth
+from app.core.models.roll_call.roll_call import RollCall, RollCallStatusEnum
+from app.routers.roll_call.view_models import RollCallViewModel, RollCallResponse, \
+    RollCallLeaveWorkResponse
+from app.tasks.organization.get_current_employee_task import GetCurrentEmployeeTask
 from app.use_cases.roll_call import UpdateRollCallUseCase, DeleteRollCallUseCase, GetAllRollCallsUseCase
 
 router = APIRouter(prefix='/roll-call', tags=['admin-roll-call'])
@@ -19,33 +26,74 @@ async def update_roll_call(
     return RollCallResponse.from_model(roll_call)
 
 
-@router.get('/', response_model=List[RollCallResponse])
+@router.get('/')
 async def get_roll_calls(
         get_roll_call_use_case: Annotated[GetAllRollCallsUseCase, Depends(GetAllRollCallsUseCase)],
-        organization_id: int | None,
-        department_id: int | None,
+        get_current_employee_task: Annotated[GetCurrentEmployeeTask, Depends(GetCurrentEmployeeTask)],
+        organization_id: int | None = None,
+        department_id: int | None = None,
         filter_date: datetime | None = None,
-        position_id: int | None = None,
-        page: int | None = None,
-        page_size: int = 10,
+        position_id: int | None = None
 ):
-    count, roll_calls = get_roll_call_use_case.execute(
+    roll_calls = get_roll_call_use_case.execute(
         organization_id,
         department_id,
         filter_date,
-        position_id,
-        page,
-        page_size
+        position_id
     )
 
-    return {
-        'count': count,
-        'data': list(
-            map(
-                lambda rc: RollCallResponse.from_model(rc), roll_calls
-            )
-        )
-    }
+    employee_ids = set(
+        map(lambda rc: rc.employee_id, roll_calls)
+    )
+
+    result = []
+
+    groups = defaultdict(list)
+    for roll_call_item in roll_calls:
+        groups[roll_call_item.created_at.date().strftime("%Y-%m-%d")].append(roll_call_item)
+    for employee_id in employee_ids:
+        for key in groups.keys():
+            if len(groups[key]) > 1:
+                try:
+                    on_work_roll_call = list(filter(
+                        lambda rci: rci.status in [RollCallStatusEnum.ON_WORK,
+                                                   RollCallStatusEnum.LATE] and rci.employee_id == employee_id,
+                        groups[key]
+                    ))[0]
+                    current_employee = on_work_roll_call.employee
+                    response_model = RollCallResponse.from_model(on_work_roll_call)
+                    leave_work_roll_call_list = list(filter(
+                        lambda rci: rci.status == RollCallStatusEnum.LEAVE_WORK and rci.employee_id == employee_id,
+                        groups[key]
+                    ))
+                    if len(leave_work_roll_call_list) == 0:
+                        result.append(response_model)
+                        continue
+                    leave_work_roll_call: RollCall = leave_work_roll_call_list[0]
+                    response_model.leave_work = RollCallLeaveWorkResponse(
+                        leave_time=leave_work_roll_call.created_at,
+                        leave_note=leave_work_roll_call.note,
+                        leave_with_location=False
+                    )
+                    if leave_work_roll_call.location and current_employee.organization.settings \
+                            and current_employee.organization.settings.roll_call_distance and (
+                            current_employee.organization.location_lat and current_employee.organization.location_lng):
+                        distance = geopy.distance.geodesic(
+                            (current_employee.organization.location_lat, current_employee.organization.location_lng),
+                            (leave_work_roll_call.location.lat, leave_work_roll_call.location.lng)
+                        )
+                        if distance.m <= current_employee.organization.settings.roll_call_distance:
+                            response_model.leave_work.leave_with_location = True
+                    result.append(response_model)
+                    continue
+
+                except IndexError:
+                    for rc in groups[key]:
+                        result.append(RollCallResponse.from_model(rc))
+                    continue
+            result.append(RollCallResponse.from_model(groups[key][0]))
+
+    return result
 
 
 @router.delete('/{roll_call_id}', status_code=status.HTTP_204_NO_CONTENT)

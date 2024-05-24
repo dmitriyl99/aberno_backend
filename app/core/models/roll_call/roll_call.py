@@ -6,6 +6,16 @@ from sqlalchemy import Enum, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
+class RollCallStatusEnum(str, Enum):
+    ON_WORK = 'ON_WORK'
+    OFF_DAY = 'OFF_DAY'
+    LATE = 'LATE',
+    SICK = 'SICK'
+    ABSENT = 'ABSENT'
+    REASONED = 'REASONED'
+    LEAVE_WORK = 'LEAVE_WORK'
+
+
 class RollCall(Base, TimestampMixin):
     __tablename__ = 'roll_calls'
 

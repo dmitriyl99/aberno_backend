@@ -1,9 +1,11 @@
-from pydantic import BaseModel
 from enum import Enum
+
+from pydantic import BaseModel
 
 from datetime import datetime, date
 
 from app.core.models.roll_call.roll_call import RollCall
+# from app.routers.admin.view_models import EmployeeResponse
 
 
 class RollCallStatusEnum(str, Enum):
@@ -53,6 +55,7 @@ class RollCallResponse(BaseModel):
     location: RollCallLocation | None = None
     sick_leave: RollCallSickLeaveResponse | None = None
     leave_work: RollCallLeaveWorkResponse | None = None
+    # employee: EmployeeResponse | None = None
     created_at: datetime
     updated_at: datetime
 
@@ -72,5 +75,7 @@ class RollCallResponse(BaseModel):
                 date_to=roll_call.sick_leave.date_to,
                 note=roll_call.sick_leave.note
             ) if roll_call.sick_leave else None
+        # if 'employee' in roll_call.__dict__:
+        #     response.employee = EmployeeResponse.from_model(roll_call.employee)
 
         return response

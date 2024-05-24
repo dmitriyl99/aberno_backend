@@ -2,9 +2,9 @@ from typing import Annotated
 from fastapi import Depends
 from sqlalchemy.orm import sessionmaker, joinedload
 
-from app.core.models.roll_call.roll_call import RollCall
+from app.core.models.roll_call.roll_call import RollCall, RollCallStatusEnum
 from app.core.models.roll_call.sick_leave import SickLeave
-from app.routers.roll_call.view_models import RollCallViewModel, RollCallStatusEnum
+from app.routers.roll_call.view_models import RollCallViewModel
 from app.dal import get_session
 
 

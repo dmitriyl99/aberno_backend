@@ -4,11 +4,10 @@ from sqlalchemy import and_
 
 from app.core.models.organization.schedule import ScheduleDay
 from app.dal import get_session
-from app.core.models.roll_call.roll_call import RollCall
+from app.core.models.roll_call.roll_call import RollCall, RollCallStatusEnum
 from app.core.models.organization import Organization, Employee
 from app.core.models.organization.department import Schedule
 from app.routers.admin.view_models import ScheduleDayEnum
-from app.routers.roll_call.view_models import RollCallStatusEnum
 
 
 def roll_call_absent():

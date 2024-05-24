@@ -5,7 +5,7 @@ from fastapi import Depends, HTTPException
 from sqlalchemy.orm import sessionmaker, joinedload
 from starlette import status
 
-from app.core.models.organization import Employee
+from app.core.models.organization import Employee, Organization
 from app.core.models.roll_call.roll_call import RollCall
 from app.dal import get_session
 from app.core.facades.auth import Auth
@@ -26,10 +26,8 @@ class GetAllRollCallsUseCase:
             organization_id: int | None,
             department_id: int | None,
             filter_date: date | None = None,
-            position_id: int | None = None,
-            page: int = 1,
-            page_size: int = 10
-    ) -> Tuple[int, List[RollCall]] | Tuple[int, List[Type[RollCall]]]:
+            position_id: int | None = None
+    ) -> List[RollCall] | List[Type[RollCall]]:
         current_user = Auth.get_current_user()
         current_employee = self.get_current_employee_task.run(current_user)
 
@@ -43,7 +41,11 @@ class GetAllRollCallsUseCase:
 
         with self.session() as session:
             query = session.query(RollCall).options(
-                joinedload(RollCall.employee).joinedload(Employee.position)
+                joinedload(RollCall.employee).options(
+                    joinedload(Employee.position),
+                    joinedload(Employee.organization).joinedload(Organization.settings)
+                ),
+                joinedload(RollCall.location)
             )
             if organization_id:
                 query = query.filter(RollCall.organization_id == organization_id)
@@ -53,6 +55,5 @@ class GetAllRollCallsUseCase:
                 query = query.filter(RollCall.employee.has(Employee.position_id == position_id))
             if filter_date:
                 query = query.filter(RollCall.created_at.date() == filter_date)
-            count = query.count()
-            return count, query.limit(page_size).offset((page - 1) * page_size).all()
+            return query.all()
 

@@ -2,6 +2,7 @@ from datetime import date
 from typing import Annotated, List, Type, Tuple
 
 from fastapi import Depends, HTTPException
+from sqlalchemy import func
 from sqlalchemy.orm import sessionmaker, joinedload
 from starlette import status
 
@@ -55,6 +56,6 @@ class GetAllRollCallsUseCase:
             if position_id:
                 query = query.filter(RollCall.employee.has(Employee.position_id == position_id))
             if filter_date:
-                query = query.filter(RollCall.created_at.date() == filter_date)
+                query = query.filter(func.date(RollCall.created_at) == filter_date)
             return query.all()
 

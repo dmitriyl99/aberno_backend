@@ -56,7 +56,7 @@ class UpdateEmployeeUseCase:
             phone = data.phone
             if phone.startswith('+'):
                 phone = phone[1:]
-            employee.phone = зрщту
+            employee.phone = phone
             user.name = data.name
             if data.password:
                 if data.password != data.password_confirmation:

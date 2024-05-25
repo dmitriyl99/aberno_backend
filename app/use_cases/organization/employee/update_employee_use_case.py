@@ -58,6 +58,7 @@ class UpdateEmployeeUseCase:
                 phone = phone[1:]
             employee.phone = phone
             user.name = data.name
+            user.last_name = data.last_name
             if data.password:
                 if data.password != data.password_confirmation:
                     raise HTTPException(status_code=400, detail="Incorrect password confirmation")

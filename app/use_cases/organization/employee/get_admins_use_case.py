@@ -50,11 +50,21 @@ class GetAdminsUseCase:
                 joinedload(Employee.created_by)
             ).filter(Employee.user.has(User.roles.any(Role.name.in_(roles))))
             if search:
-                query = query.filter(or_(
-                    Employee.user.has(User.name.ilike(f"%{search}%")),
-                    Employee.user.has(User.last_name.ilike(f"%{search}%")),
-                    Employee.phone.ilike(f"%{search}%"),
-                ))
+                search_splitted = search.split(' ')
+                if len(search_splitted) == 2:
+                    query = query.filter(or_(
+                        Employee.user.has(User.name.ilike(f"%{search_splitted[0]}%")),
+                        Employee.user.has(User.name.ilike(f"%{search_splitted[1]}%")),
+                        Employee.user.has(User.last_name.ilike(f"%{search_splitted[0]}%")),
+                        Employee.user.has(User.last_name.ilike(f"%{search_splitted[1]}%")),
+                        Employee.phone.ilike(f"%{search}%"),
+                    ))
+                else:
+                    query = query.filter(or_(
+                        Employee.user.has(User.name.ilike(f"%{search}%")),
+                        Employee.user.has(User.last_name.ilike(f"%{search}%")),
+                        Employee.phone.ilike(f"%{search}%"),
+                    ))
             if organization_id:
                 query = query.filter(Employee.organization_id == organization_id)
             if department_id:

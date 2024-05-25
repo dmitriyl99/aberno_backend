@@ -25,6 +25,7 @@ class GetAdminsUseCase:
             search: str | None = None,
             organization_id: int | None = None,
             department_id: int | None = None,
+            employee_status: str | None = None,
             role: str | None = None,
             page: int = 1,
             per_page: int = 10
@@ -50,13 +51,18 @@ class GetAdminsUseCase:
             ).filter(Employee.user.has(User.roles.any(Role.name.in_(roles))))
             if search:
                 query = query.filter(or_(
-                    User.name.ilike(f"%{search}%"),
+                    Employee.user.has(User.name.ilike(f"%{search}%")),
+                    Employee.user.has(User.last_name.ilike(f"%{search}%")),
                     Employee.phone.ilike(f"%{search}%"),
                 ))
             if organization_id:
                 query = query.filter(Employee.organization_id == organization_id)
             if department_id:
                 query = query.filter(Employee.department_id == department_id)
+            if employee_status:
+                is_active_filter = employee_status == 'true'
+                print(is_active_filter)
+                query = query.filter(Employee.user.has(User.is_active == is_active_filter))
             return query.order_by(Employee.created_at.desc()).limit(per_page).offset(
                 (page - 1) * per_page).all(), query.count()
 

@@ -51,6 +51,7 @@ async def get_admins(
         search: str | None = None,
         organization_id: int | None = None,
         department_id: int | None = None,
+        status: str | None = None,
         role: str | None = None,
         page: int = 1,
         per_page: int = 10
@@ -60,6 +61,7 @@ async def get_admins(
         search,
         organization_id,
         department_id,
+        status,
         role,
         page,
         per_page

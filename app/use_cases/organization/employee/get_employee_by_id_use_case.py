@@ -23,6 +23,7 @@ class GetEmployeeByIdUseCase:
         with self.session() as session:
             organization = session.query(Employee).options(
                 joinedload(Employee.department),
+                joinedload(Employee.position),
                 joinedload(Employee.user).joinedload(User.roles),
                 joinedload(Employee.created_by)
             ).filter(and_(

@@ -53,7 +53,6 @@ class UpdateEmployeeUseCase:
                 return None
             employee.department_id = data.department_id
             employee.position_id = data.position_id
-            employee.birth_date = data.birth_date
             employee.phone = data.phone
             user.name = data.name
             if data.password:

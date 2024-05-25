@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker, joinedload, contains_eager
 from fastapi import Depends, HTTPException
 from starlette import status
 
-from app.core.models.auth import User
+from app.core.models.auth import User, Role
 from app.dal import get_session
 from app.core.models.organization import Employee
 from app.tasks.organization.get_current_employee_task import GetCurrentEmployeeTask
@@ -43,7 +43,8 @@ class GetEmployeesUseCase:
                 joinedload(Employee.created_by),
                 joinedload(Employee.position)
             ).filter(
-                Employee.organization_id == current_employee.organization_id
+                Employee.organization_id == current_employee.organization_id,
+                Employee.user.has(User.roles.any(Role.name.in_(['Employee'])))
             )
             if search is not None:
                 query = query.filter(or_(

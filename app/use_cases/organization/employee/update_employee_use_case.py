@@ -53,7 +53,10 @@ class UpdateEmployeeUseCase:
                 return None
             employee.department_id = data.department_id
             employee.position_id = data.position_id
-            employee.phone = data.phone
+            phone = data.phone
+            if phone.startswith('+'):
+                phone = phone[1:]
+            employee.phone = зрщту
             user.name = data.name
             if data.password:
                 if data.password != data.password_confirmation:

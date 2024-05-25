@@ -31,11 +31,20 @@ async def get_employees(
         get_employees_use_case: Annotated[GetEmployeesUseCase, Depends(GetEmployeesUseCase)],
         search: str | None = None,
         department_id: int | None = None,
+        position_id: int | None = None,
         status: str | None = None,
         page: int = 1,
         per_page: int = 10
 ):
-    employees, count = get_employees_use_case.execute(Auth.get_current_user(), search, department_id, status, page, per_page)
+    employees, count = get_employees_use_case.execute(
+        Auth.get_current_user(),
+        search,
+        department_id,
+        position_id,
+        status,
+        page,
+        per_page
+    )
 
     return {
         'count': count,

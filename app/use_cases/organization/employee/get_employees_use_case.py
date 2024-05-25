@@ -24,6 +24,7 @@ class GetEmployeesUseCase:
             user: User,
             search: str | None = None,
             department_id: int | None = None,
+            position_id: int | None = None,
             employee_status: str | None = None,
             page: int = 1,
             per_page: int = 10
@@ -52,6 +53,8 @@ class GetEmployeesUseCase:
                 ))
             if department_id is not None:
                 query = query.filter(Employee.department_id == department_id)
+            if position_id is not None:
+                query = query.filter(Employee.position_id == position_id)
             if employee_status:
                 is_active_filter = employee_status == 'true'
                 print(is_active_filter)

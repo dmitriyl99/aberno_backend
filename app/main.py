@@ -27,7 +27,8 @@ async def lifespan(app: FastAPI):
 app = FastAPI(debug=settings.environment in ['local', 'debug'], title="Aberno API", lifespan=lifespan)
 
 origins = [
-    "http://localhost:5173"
+    "http://localhost:5173",
+    'https://aberno-app.com'
 ]
 
 app.add_middleware(

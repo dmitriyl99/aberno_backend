@@ -48,12 +48,6 @@ class CreateEmployeeUseCase:
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail='Username is already taken'
                 )
-            count_employees_with_phone = session.query(Employee).filter(Employee.phone == data.phone).count()
-            if count_employees_with_phone > 0:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail='Phone number is already taken'
-                )
             session.add(user)
             if data.role_id:
                 role: Role = session.query(Role).get(data.role_id)

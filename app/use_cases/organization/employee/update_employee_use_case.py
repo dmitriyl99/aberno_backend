@@ -39,15 +39,6 @@ class UpdateEmployeeUseCase:
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail='Username is already taken'
                 )
-            count_employees_with_phone = session.query(Employee).filter(and_(
-                Employee.phone == data.phone,
-                Employee.id != employee.id
-            )).count()
-            if count_employees_with_phone > 0:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail='Phone number is already taken'
-                )
             user: User = session.query(User).get(employee.user_id)
             if user is None:
                 return None

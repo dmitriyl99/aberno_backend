@@ -16,7 +16,8 @@ class GetOrganizationsCase:
 
     def execute(self, search: str | None = None) -> List[Type[Organization]]:
         with self.session() as session:
-            query = session.query(Organization)
+            query = session.query(Organization).options(joinedload(Organization.settings),
+                                                        joinedload(Organization.departments))
             if search is not None:
                 query = query.filter(or_(
                     Organization.name.ilike(f"%{search}%"),

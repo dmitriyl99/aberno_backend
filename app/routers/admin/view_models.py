@@ -5,6 +5,7 @@ from typing import List, Any
 from pydantic import BaseModel
 
 from app.core.models.organization import Organization, Department, Employee
+from app.core.models.organization.organization_settings import OrganizationSettings
 from app.core.models.organization.position import Position
 from app.routers.auth.view_models import CurrentUserViewModel
 
@@ -158,6 +159,15 @@ class OrganizationSettingsViewModel(BaseModel):
     roll_call_distance: int | None = None
     work_leave_enabled: bool | None = None
 
+    @staticmethod
+    def from_model(model: OrganizationSettings):
+        return OrganizationSettingsViewModel(
+            roll_call_start_time=model.roll_call_start_time,
+            roll_call_end_time=model.roll_call_end_time,
+            roll_call_distance=model.roll_call_distance,
+            work_leave_enabled=model.work_leave_enabled
+        )
+
 
 class OrganizationResponse(CreateOrganizationViewModel):
     id: int
@@ -182,10 +192,9 @@ class OrganizationResponse(CreateOrganizationViewModel):
         if 'departments' in model.__dict__:
             response.departments = list(
                 map(
-                    lambda department: DepartmentResponse(
-                        id=department.id,
-                        name=department.name
-                    ), model.departments
+                    lambda department: DepartmentResponse.from_model(department), model.departments
                 )
             )
+        if 'settings' in model.__dict__ and model.settings:
+            response.settings = OrganizationSettingsViewModel.from_model(model.settings)
         return response

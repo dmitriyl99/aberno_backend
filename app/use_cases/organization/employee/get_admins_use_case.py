@@ -5,7 +5,7 @@ from sqlalchemy import or_
 from sqlalchemy.orm import sessionmaker, joinedload
 
 from app.core.models.auth import User, Role
-from app.core.models.organization import Employee
+from app.core.models.organization import Employee, Department
 from app.dal import get_session
 from app.tasks.organization.get_current_employee_task import GetCurrentEmployeeTask
 
@@ -46,7 +46,8 @@ class GetAdminsUseCase:
         with self.session() as session:
             query = session.query(Employee).populate_existing().options(
                 joinedload(Employee.user).joinedload(User.roles),
-                joinedload(Employee.department),
+                joinedload(Employee.department).joinedload(Department.organization),
+                joinedload(Employee.position),
                 joinedload(Employee.created_by)
             ).filter(Employee.user.has(User.roles.any(Role.name.in_(roles))))
             if search:

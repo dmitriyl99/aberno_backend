@@ -11,3 +11,4 @@ class Position(Base):
     name: Mapped[str] = mapped_column(String(200))
 
     organization_id: Mapped[int] = mapped_column(ForeignKey('organizations.id'))
+    department_id: Mapped[int] = mapped_column(ForeignKey('departments.id'))

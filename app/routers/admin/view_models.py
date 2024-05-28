@@ -117,6 +117,7 @@ class PositionViewModel(BaseModel):
 class CreatePositionViewModel(BaseModel):
     name: str
     organization_id: int | None = None
+    department_id: int | None = None
 
 
 class EmployeeResponse(BaseModel):

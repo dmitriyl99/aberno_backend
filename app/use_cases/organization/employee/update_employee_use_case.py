@@ -5,32 +5,25 @@ from sqlalchemy.orm import sessionmaker
 from fastapi import Depends, HTTPException, status
 from passlib.context import CryptContext
 
-from app.core.models.auth import User, Role
+from app.core.models.auth import User
 from app.dal import get_session
 from app.core.models.organization import Employee
 from app.routers.admin.view_models import CreateEmployeeViewModel
 from app.tasks.organization.get_current_employee_task import GetCurrentEmployeeTask
-from .change_employee_role_use_case import ChangeEmployeeRoleUseCase
 
 
 class UpdateEmployeeUseCase:
     def __init__(self,
                  session: Annotated[sessionmaker, Depends(get_session)],
                  get_current_employee_task: Annotated[GetCurrentEmployeeTask, Depends(GetCurrentEmployeeTask)],
-                 change_employee_role_use_case: Annotated[ChangeEmployeeRoleUseCase, Depends(ChangeEmployeeRoleUseCase)]
                  ):
         self.session = session
         self.get_current_employee_task = get_current_employee_task
-        self.change_employee_role_use_case = change_employee_role_use_case
         self.pwd_context = CryptContext(schemes=['bcrypt'], deprecated="auto")
 
     def execute(self, current_user: User, employee_id: int,
                 data: CreateEmployeeViewModel) -> Employee | None:
         current_employee = self.get_current_employee_task.run(current_user)
-        error = HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail='You do not have permission to perform this action'
-        )
         with self.session() as session:
             employee = session.query(Employee).filter(
                 and_(Employee.organization_id == current_employee.organization_id, Employee.id == employee_id)
@@ -61,16 +54,6 @@ class UpdateEmployeeUseCase:
                 if data.password != data.password_confirmation:
                     raise HTTPException(status_code=400, detail="Incorrect password confirmation")
                 user.password = self.pwd_context.hash(data.password)
-            if data.role_id:
-                role: Role = session.query(Role).get(data.role_id)
-                if role.name in ['Super Admin', 'Admin'] and not current_user.is_super_admin:
-                    raise error
-                if current_employee.organization_id != employee.organization_id and not current_user.is_super_admin:
-                    raise error
-                if not current_user.is_admin:
-                    raise error
-                user.roles.clear()
-                user.roles.append(role)
             session.commit()
             session.refresh(employee)
             session.refresh(employee.user)

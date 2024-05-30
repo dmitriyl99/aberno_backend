@@ -55,7 +55,7 @@ class CreateDepartmentViewModel(BaseModel):
 class CreateEmployeeViewModel(BaseModel):
     name: str
     last_name: str
-    username: str | None = None
+    username: str
     password: str | None = None
     password_confirmation: str | None = None
 

@@ -33,7 +33,7 @@ class CurrentUserViewModel(BaseModel):
     id: int
     name: str
     last_name: str | None
-    username: str
+    username: str | None
     created_at: datetime
     updated_at: datetime
     is_active: bool

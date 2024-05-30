@@ -50,7 +50,7 @@ async def get_organization_settings(
         roll_call_start_time=settings.roll_call_start_time if settings else None,
         roll_call_end_time=settings.roll_call_end_time if settings else None,
         roll_call_distance=settings.roll_call_distance if settings else None,
-        work_leave_enabled=settings.work_leave_enabled
+        work_leave_enabled=settings.work_leave_enabled if settings else None,
     )
 
 

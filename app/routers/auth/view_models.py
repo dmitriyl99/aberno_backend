@@ -34,6 +34,7 @@ class CurrentUserViewModel(BaseModel):
     name: str
     last_name: str | None
     username: str | None
+    employee_number: str | None
     created_at: datetime
     updated_at: datetime
     is_active: bool
@@ -48,6 +49,7 @@ class CurrentUserViewModel(BaseModel):
             last_name=user.last_name,
             is_active=user.is_active,
             username=user.username,
+            employee_number=user.employee_number,
             created_at=user.created_at,
             updated_at=user.updated_at,
         )

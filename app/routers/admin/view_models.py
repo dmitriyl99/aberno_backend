@@ -105,12 +105,14 @@ class CreatedByViewModel(BaseModel):
 class PositionViewModel(BaseModel):
     id: int
     name: str
+    department_id: int | None = None
 
     @staticmethod
     def from_model(model: Position):
         return PositionViewModel(
             id=model.id,
-            name=model.name
+            name=model.name,
+            department_id=model.department_id
         )
 
 

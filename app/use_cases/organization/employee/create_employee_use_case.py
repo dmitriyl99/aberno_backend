@@ -44,12 +44,12 @@ class CreateEmployeeUseCase:
         current_employee = self.get_current_employee_task.run(current_user)
 
         with self.session() as session:
-            count_users_with_username = session.query(User).filter(User.username == data.username).count()
-            if count_users_with_username > 0:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail='Username is already taken'
-                )
+            # count_users_with_username = session.query(User).filter(User.username == data.username).count()
+            # if count_users_with_username > 0:
+            #     raise HTTPException(
+            #         status_code=status.HTTP_400_BAD_REQUEST,
+            #         detail='Username is already taken'
+            #     )
             user = User(
                 name=data.name,
                 last_name=data.last_name,

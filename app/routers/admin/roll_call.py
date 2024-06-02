@@ -87,7 +87,7 @@ async def get_roll_calls(
                     continue
 
                 except IndexError:
-                    for rc in groups[key]:
+                    for rc in filter(lambda rc: rc.employee_id == employee_id, groups[key]):
                         result.append(RollCallResponse.from_model(rc))
                     continue
             result.append(RollCallResponse.from_model(groups[key][0]))

@@ -1,3 +1,4 @@
+from typing import List
 from enum import Enum
 from datetime import datetime
 
@@ -21,13 +22,21 @@ class TaskPriorityEnum(Enum):
     LOW = "LOW"
 
 
+class EmployeesTasks(Base):
+    __tablename__ = "employees_tasks"
+    employee_id: Mapped[int] = mapped_column(ForeignKey('employees.id'), primary_key=True)
+    task_id: Mapped[int] = mapped_column(ForeignKey('tasks.id'), primary_key=True)
+    status: Mapped[str] = mapped_column(String(100))
+    employee: Mapped[Employee] = relationship()
+
+
 class Task(Base, TimestampMixin):
     __tablename__ = "tasks"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column(String(200))
     description: Mapped[str] = mapped_column(Text)
-    status: Mapped[str] = mapped_column(String(50))
+    status: Mapped[str] = mapped_column(String(100))
     priority: Mapped[str] = mapped_column(String(50))
     deadline: Mapped[datetime] = mapped_column(DateTime)
     viewed: Mapped[bool] = mapped_column(Boolean(), default=False)
@@ -39,5 +48,5 @@ class Task(Base, TimestampMixin):
     organization_id: Mapped[int] = mapped_column(ForeignKey('organizations.id'))
 
     department: Mapped[Department] = relationship(foreign_keys=[department_id])
-    executor: Mapped[Employee] = relationship(foreign_keys=[executor_id])
+    executors: Mapped[List[EmployeesTasks]] = relationship()
     created_by: Mapped[Employee] = relationship(foreign_keys=[created_by_id])

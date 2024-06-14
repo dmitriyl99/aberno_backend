@@ -1,9 +1,11 @@
 from datetime import datetime
+from typing import List
 
 from pydantic import BaseModel
 
 from app.core.models.organization import Employee, Department
 from app.core.models.tasks import Task, TaskStatusEnum, TaskPriorityEnum
+from app.core.models.tasks.task import EmployeesTasks
 from app.routers.admin.view_models import PositionViewModel
 from app.routers.auth.view_models import CurrentUserViewModel
 
@@ -38,6 +40,20 @@ class EmployeeResponse(BaseModel):
         return response
 
 
+class EmployeeTaskResponse(BaseModel):
+    employee: EmployeeResponse
+    status: TaskStatusEnum
+
+    @staticmethod
+    def from_model(employee_task: EmployeesTasks):
+        response = EmployeeTaskResponse(
+            status=employee_task.status
+        )
+        if 'employee' in employee_task.__dict__ and employee_task.employee:
+            response.employee = EmployeeResponse.from_model(employee_task.employee)
+        return response
+
+
 class TaskViewModel(BaseModel):
     title: str
     description: str | None
@@ -45,7 +61,7 @@ class TaskViewModel(BaseModel):
     deadline: datetime | None
 
     department_id: int | None
-    executor_id: int | None
+    executors_ids: List[int] | None
 
 
 class TaskStatusViewModel(BaseModel):
@@ -58,7 +74,7 @@ class TaskResponse(TaskViewModel):
     status: TaskStatusEnum
 
     department: DepartmentResponse | None = None
-    executor: EmployeeResponse | None = None
+    executors: List[EmployeeTaskResponse] | None = None
     created_by: EmployeeResponse | None = None
     viewed: bool
     viewed_at: datetime | None = None
@@ -86,10 +102,10 @@ class TaskResponse(TaskViewModel):
         if 'department' in task.__dict__ and task.department:
             response.department = DepartmentResponse.from_model(task.department)
 
-        if 'executor' in task.__dict__ and task.executor:
-            response.executor = EmployeeResponse.from_model(task.executor)
+        if 'executors' in task.__dict__ and task.executors:
+            response.executors = list(map(lambda e: EmployeeTaskResponse.from_model(e), task.executors))
 
-        if 'created_by' in task.__dict__ and task.executor:
+        if 'created_by' in task.__dict__ and task.created_by:
             response.created_by = EmployeeResponse.from_model(task.created_by)
 
         return response

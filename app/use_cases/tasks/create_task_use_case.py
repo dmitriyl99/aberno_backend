@@ -2,6 +2,7 @@ from typing import Annotated
 from sqlalchemy.orm import sessionmaker
 from fastapi import Depends
 
+from app.core.models.tasks.task import EmployeesTasks
 from app.dal import get_session
 from app.core.models.tasks import Task, TaskStatusEnum
 from app.routers.tasks.view_models import TaskViewModel
@@ -32,23 +33,26 @@ class CreateTaskUseCase:
                 deadline=dto.deadline,
                 organization_id=current_employee.organization_id,
                 department_id=dto.department_id,
-                executor_id=dto.executor_id,
                 created_by_id=current_employee.id
             )
             session.add(task)
+            if dto.executors_ids is not None:
+                for executor_id in dto.executors_ids:
+                    task.executors.append(EmployeesTasks(employee_id=executor_id, status=TaskStatusEnum.PENDING.value))
             session.commit()
             session.refresh(task)
             session.refresh(task.department)
-            session.refresh(task.executor)
+            session.refresh(task.executors)
             session.refresh(task.created_by)
 
-            if task.executor:
+            if task.executors:
                 try:
-                    self.send_notification_task.run(
-                        f"Вам назначена задача {task.title}",
-                        "Нажмите, чтобы посмотреть",
-                        task.executor.user_id
-                    )
+                    for executor in task.executors:
+                        self.send_notification_task.run(
+                            f"Вам назначена задача {task.title}",
+                            "Нажмите, чтобы посмотреть",
+                            executor.employee.user_id
+                        )
                 except Exception:
                     pass
 

@@ -19,7 +19,7 @@ class UpdatePositionUseCase:
         self.session = session
         self.get_current_employee_task = get_current_employee_task
 
-    def execute(self, id: int, name: str) -> Position:
+    def execute(self, id: int, name: str, department_id: int | None) -> Position:
         current_user = Auth.get_current_user()
         current_employee = self.get_current_employee_task.run(current_user)
         if not (current_user.is_super_admin or current_user.is_admin):
@@ -40,6 +40,7 @@ class UpdatePositionUseCase:
                     detail="You do not have permission to perform this"
                 )
             position.name = name
+            position.department_id = department_id
             session.commit()
             session.refresh(position)
             return position

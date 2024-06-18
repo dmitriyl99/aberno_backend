@@ -18,7 +18,7 @@ class GetPositionsUseCase:
         self.session = session
         self.get_current_employee_task = get_current_employee_task
 
-    def execute(self, organization_id: int | None) -> List[Position] | List[Type[Position]]:
+    def execute(self, organization_id: int | None, department_id: int | None) -> List[Position] | List[Type[Position]]:
         current_user = Auth.get_current_user()
         current_employee = self.get_current_employee_task.run(current_user)
         if (organization_id and not current_user.is_super_admin) or (not organization_id):
@@ -27,4 +27,6 @@ class GetPositionsUseCase:
             query = session.query(Position)
             if organization_id:
                 query = query.filter(Position.organization_id == organization_id)
+            if department_id:
+                query = query.filter(Position.department_id == department_id)
             return query.all()

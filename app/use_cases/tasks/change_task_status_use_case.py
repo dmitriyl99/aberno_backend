@@ -3,6 +3,8 @@ from typing import Annotated
 from sqlalchemy.orm import sessionmaker, joinedload
 from fastapi import Depends, HTTPException, status as fastapi_status
 
+from app.core.models.organization import Employee
+from app.core.models.tasks.task import EmployeesTasks
 from app.dal import get_session
 from app.core.facades.auth import Auth
 from app.core.models.tasks import TaskStatusEnum, Task
@@ -40,8 +42,9 @@ class ChangeTaskStatusUseCase:
         current_employee = self.get_current_employee_task.run(current_user)
         with self.session() as session:
             task: Task = session.query(Task).options(
-                joinedload(Task.created_by),
-                joinedload(Task.executors)
+                joinedload(Task.created_by).joinedload(Employee.user),
+                joinedload(Task.controller).joinedload(Employee.user),
+                joinedload(Task.executors).joinedload(EmployeesTasks.employee).joinedload(Employee.user)
             ).get(task_id)
             if current_user.is_admin or current_user.is_super_admin or current_employee.id == task.created_by_id:
                 task.status = status.value

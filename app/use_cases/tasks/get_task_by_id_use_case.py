@@ -29,7 +29,8 @@ class GetTaskByIdUseCase:
             task: Task = session.query(Task).options(
                 joinedload(Task.department),
                 joinedload(Task.executors).joinedload(EmployeesTasks.employee).joinedload(Employee.user),
-                joinedload(Task.created_by).joinedload(Employee.user)
+                joinedload(Task.created_by).joinedload(Employee.user),
+                joinedload(Task.controller).joinedload(Employee.user),
             ).get(task_id)
 
             if current_employee.id in list(map(lambda et: et.employee_id, task.executors)):

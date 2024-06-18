@@ -37,6 +37,7 @@ class UpdateTaskUseCase:
             task.priority = dto.priority.value,
             task.deadline = dto.deadline,
             task.department_id = dto.department_id,
+            task.controller_employee_id = dto.controller_id
             session.commit()
             session.refresh(task)
             session.refresh(task.department)

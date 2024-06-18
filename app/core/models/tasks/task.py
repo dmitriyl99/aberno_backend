@@ -47,7 +47,9 @@ class Task(Base, TimestampMixin):
     department_id: Mapped[int] = mapped_column(ForeignKey('departments.id'))
     created_by_id: Mapped[int] = mapped_column(ForeignKey('employees.id'))
     organization_id: Mapped[int] = mapped_column(ForeignKey('organizations.id'))
+    controller_employee_id: Mapped[int] = mapped_column(ForeignKey('employees.id', ondelete='SET NULL'), nullable=True)
 
     department: Mapped[Department] = relationship(foreign_keys=[department_id])
     executors: Mapped[List[EmployeesTasks]] = relationship()
     created_by: Mapped[Employee] = relationship(foreign_keys=[created_by_id])
+    controller: Mapped[Employee] = relationship(foreign_keys=[controller_employee_id])

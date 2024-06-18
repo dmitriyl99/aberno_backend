@@ -61,6 +61,7 @@ class TaskViewModel(BaseModel):
     deadline: datetime | None
 
     department_id: int | None
+    controller_id: int | None
     executors_ids: List[int] | None
 
 
@@ -80,6 +81,7 @@ class TaskResponse(TaskViewModel):
     department: DepartmentResponse | None = None
     executors: List[EmployeeTaskResponse] | None = None
     created_by: EmployeeResponse | None = None
+    controller: EmployeeResponse | None = None
     viewed: bool
     viewed_at: datetime | None = None
 
@@ -110,5 +112,8 @@ class TaskResponse(TaskViewModel):
 
         if 'created_by' in task.__dict__ and task.created_by:
             response.created_by = EmployeeResponse.from_model(task.created_by)
+
+        if 'controller' in task.__dict__ and task.controller:
+            response.controller = EmployeeResponse.from_model(task.controller)
 
         return response

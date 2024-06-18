@@ -7,6 +7,7 @@ from fastapi import Depends
 
 from app.core.models.auth import User
 from app.core.models.organization import Employee
+from app.core.models.tasks.task import EmployeesTasks
 from app.dal import get_session
 from app.core.models.tasks import Task
 from app.core.facades.auth import Auth
@@ -37,13 +38,13 @@ class GetTasksUseCase:
         with self.session() as session:
             query = session.query(Task).options(
                 joinedload(Task.department),
-                joinedload(Task.executor).joinedload(Employee.user),
+                joinedload(Task.executors).joinedload(EmployeesTasks.employee).joinedload(Employee.user),
                 joinedload(Task.created_by).joinedload(Employee.user)
             ).filter(Task.organization_id == current_employee.organization_id)
             if department_id and department_id != 0:
                 query = query.filter(Task.department_id == department_id)
             if executor_id and executor_id != 0:
-                query = query.filter(Task.executor_id == executor_id)
+                query = query.filter(Task.executors.has(EmployeesTasks.employee_id == executor_id))
             if status:
                 statuses = status.split(',')
                 query = query.filter(Task.status.in_(statuses))
@@ -57,7 +58,8 @@ class GetTasksUseCase:
                 query = query.filter(
                     or_(Task.title.ilike(f'%{search}%'), Task.description.ilike(f'%{search}%'),
                         Task.created_by.has(Employee.user.has(User.name.ilike(f'f%{search}%'))),
-                        Task.executor.has(Employee.user.has(User.name.ilike(f'%{search}%')))
+                        Task.executors.has(
+                            EmployeesTasks.employee.has(Employee.user.has(User.name.ilike(f'%{search}%'))))
                         )
                 )
             query = query.order_by(Task.created_at.desc())

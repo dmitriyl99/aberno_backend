@@ -26,32 +26,21 @@ class UpdateTaskUseCase:
         current_employee = self.get_current_employee_task.run(current_user)
         with self.session() as session:
             task: Task = session.query(Task).get(task_id)
-            new_executor = task.executor_id != dto.executor_id
-            if current_employee.id != task.created_by_id:
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    detail='You do not have permission to update this task'
-                )
+            if not current_user.is_super_admin or not current_user.is_admin:
+                if current_employee.id != task.created_by_id:
+                    raise HTTPException(
+                        status_code=status.HTTP_403_FORBIDDEN,
+                        detail='You do not have permission to update this task'
+                    )
             task.title = dto.title,
             task.description = dto.description,
             task.priority = dto.priority.value,
             task.deadline = dto.deadline,
             task.department_id = dto.department_id,
-            task.executor_id = dto.executor_id
             session.commit()
             session.refresh(task)
             session.refresh(task.department)
-            session.refresh(task.executor)
+            session.refresh(task.executors)
             session.refresh(task.created_by)
-
-            if task.executor and new_executor:
-                try:
-                    self.send_notification_task.run(
-                        f"Вам назначена задача {task.title}",
-                        "Нажмите, чтобы посмотреть",
-                        task.executor.user_id
-                    )
-                except Exception:
-                    pass
 
             return task

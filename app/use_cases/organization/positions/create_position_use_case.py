@@ -20,7 +20,7 @@ class CreatePositionUseCase:
         self.session = session
         self.get_current_employee_task = get_current_employee_task
 
-    def execute(self, name: str, organization_id: int| None, department_id: int | None) -> Position:
+    def execute(self, name: str, organization_id: int| None) -> Position:
         current_user = Auth.get_current_user()
         if not(current_user.is_super_admin or current_user.is_admin):
             raise HTTPException(
@@ -38,7 +38,7 @@ class CreatePositionUseCase:
             if position_exists:
                 raise HTTPException(status_code=status.HTTP_409_CONFLICT,
                                     detail="Position with this name already exists")
-            position = Position(name=name, organization_id=organization_id, department_id=department_id)
+            position = Position(name=name, organization_id=organization_id)
             session.add(position)
             session.commit()
             session.refresh(position)

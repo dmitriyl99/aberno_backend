@@ -55,7 +55,7 @@ class CreateDepartmentViewModel(BaseModel):
 class CreateEmployeeViewModel(BaseModel):
     name: str
     last_name: str
-    username: str | None = None
+    username: str
     password: str | None = None
     password_confirmation: str | None = None
 
@@ -119,7 +119,6 @@ class PositionViewModel(BaseModel):
 class CreatePositionViewModel(BaseModel):
     name: str
     organization_id: int | None = None
-    department_id: int | None = None
 
 
 class EmployeeResponse(BaseModel):

@@ -128,7 +128,6 @@ async def get_employee_roll_call_history(
 ):
     if not filter_date:
         filter_date = date.today()
-    today = date.today()
     employee = get_employee_by_id_use_case.execute(Auth.get_current_user(), employee_id)
     if not employee:
         raise HTTPException(status_code=404, detail="Employee not found")
@@ -136,13 +135,9 @@ async def get_employee_roll_call_history(
 
     start_date = filter_date.replace(day=1)
     end_date = filter_date.replace(day=calendar.monthrange(filter_date.year, filter_date.month)[1])
-    if end_date > today:
-        end_date = today
     result = {}
     current_date = start_date
     while current_date <= end_date:
-        if current_date < employee.created_at.date():
-            continue
         filtered_roll_calls = list(
             filter(
                 lambda r: r.created_at.date() == current_date, roll_call_history

@@ -18,12 +18,10 @@ router = APIRouter(prefix='/positions', tags=['positions'])
 @router.get('/', response_model=List[PositionViewModel])
 def get_positions(
         get_positions_use_case: Annotated[GetPositionsUseCase, Depends(GetPositionsUseCase)],
-        organization_id: int | None = None,
-        department_id: int | None = None
+        organization_id: int | None = None
 ):
     return list(
-        map(lambda position: PositionViewModel.from_model(position),
-            get_positions_use_case.execute(organization_id, department_id))
+        map(lambda position: PositionViewModel.from_model(position), get_positions_use_case.execute(organization_id))
     )
 
 
@@ -32,7 +30,7 @@ def create_position(
         create_position_use_case: Annotated[CreatePositionUseCase, Depends(CreatePositionUseCase)],
         data: CreatePositionViewModel
 ):
-    position = create_position_use_case.execute(data.name, data.organization_id, data.department_id)
+    position = create_position_use_case.execute(data.name, data.organization_id)
     return PositionViewModel.from_model(position)
 
 
@@ -42,7 +40,7 @@ def update_position(
         id: int,
         data: CreatePositionViewModel,
 ):
-    position = update_position_use_case.execute(id, data.name, data.department_id)
+    position = update_position_use_case.execute(id, data.name)
     return PositionViewModel.from_model(position)
 
 

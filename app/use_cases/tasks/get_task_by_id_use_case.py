@@ -5,6 +5,7 @@ from sqlalchemy.orm import sessionmaker, joinedload
 from fastapi import Depends
 
 from app.core.models.organization import Employee
+from app.core.models.tasks.task import EmployeesTasks
 from app.dal import get_session
 from app.core.models.tasks import Task
 from app.core.facades.auth import Auth
@@ -27,13 +28,15 @@ class GetTaskByIdUseCase:
         with self.session() as session:
             task: Task = session.query(Task).options(
                 joinedload(Task.department),
-                joinedload(Task.executor).joinedload(Employee.user),
+                joinedload(Task.executors).joinedload(EmployeesTasks.employee).joinedload(Employee.user),
                 joinedload(Task.created_by).joinedload(Employee.user)
             ).get(task_id)
 
-            if task.executor_id == current_employee.id and not task.viewed:
-                task.viewed = True
-                task.viewed_at = datetime.now()
-                session.commit()
-                session.refresh(task)
+            if current_employee.id in list(map(lambda et: et.employee_id, task.executors)):
+                employee_task: EmployeesTasks = list(filter(lambda et: et.employee_id == current_employee.id, task.executors))[0]
+                if not employee_task.viewed:
+                    employee_task.viewed = True
+                    employee_task.viewed_at = datetime.now()
+                    session.commit()
+                    session.refresh(employee_task)
             return task

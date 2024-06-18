@@ -4,7 +4,7 @@ from typing import List, Annotated
 from fastapi import APIRouter, Depends, status as http_status
 
 from app.dependencies import verify_authenticated_user
-from .view_models import TaskResponse, TaskViewModel, TaskStatusViewModel
+from .view_models import TaskResponse, TaskViewModel, TaskStatusViewModel, TaskExecutorViewModel
 from app.use_cases.tasks import (
     GetTasksUseCase,
     UpdateTaskUseCase,
@@ -14,6 +14,8 @@ from app.use_cases.tasks import (
 )
 from app.core.facades.auth import Auth
 from ...tasks.organization.get_current_employee_task import GetCurrentEmployeeTask
+from ...use_cases.tasks.add_task_executor_use_case import AddTaskExecutorUseCase
+from ...use_cases.tasks.remove_task_executor_use_case import RemoveTaskExecutorUseCase
 
 router = APIRouter(prefix='/tasks', tags=['tasks'], dependencies=[Depends(verify_authenticated_user)])
 
@@ -132,4 +134,24 @@ async def update_task(
 ):
     task = update_task_use_case.execute(task_id, dto)
 
+    return TaskResponse.from_model(task)
+
+
+@router.post('/{task_id}/executor', response_model=TaskResponse)
+async def add_executor_task(
+        task_id: int,
+        dto: TaskExecutorViewModel,
+        add_task_executor_use_case: Annotated[AddTaskExecutorUseCase, Depends(AddTaskExecutorUseCase)]
+):
+    task = add_task_executor_use_case.execute(task_id, dto.employee_id)
+    return TaskResponse.from_model(task)
+
+
+@router.delete('/{task_id}/executor', response_model=TaskResponse)
+async def add_executor_task(
+        task_id: int,
+        dto: TaskExecutorViewModel,
+        remove_task_executor_use_case: Annotated[RemoveTaskExecutorUseCase, Depends(RemoveTaskExecutorUseCase)]
+):
+    task = remove_task_executor_use_case.execute(task_id, dto.employee_id)
     return TaskResponse.from_model(task)

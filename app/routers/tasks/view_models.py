@@ -43,11 +43,15 @@ class EmployeeResponse(BaseModel):
 class EmployeeTaskResponse(BaseModel):
     employee: EmployeeResponse
     status: TaskStatusEnum
+    viewed: bool
+    viewed_at: datetime | None = None
 
     @staticmethod
     def from_model(employee_task: EmployeesTasks):
         response = EmployeeTaskResponse(
-            status=employee_task.status
+            status=employee_task.status,
+            viewed=employee_task.viewed,
+            viewed_at=employee_task.viewed_at,
         )
         if 'employee' in employee_task.__dict__ and employee_task.employee:
             response.employee = EmployeeResponse.from_model(employee_task.employee)
@@ -82,8 +86,6 @@ class TaskResponse(TaskViewModel):
     executors: List[EmployeeTaskResponse] | None = None
     created_by: EmployeeResponse | None = None
     controller: EmployeeResponse | None = None
-    viewed: bool
-    viewed_at: datetime | None = None
 
     created_at: datetime
     updated_at: datetime

@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 from app.core.models.organization import Employee, Department
 from app.core.models.tasks import Task, TaskStatusEnum, TaskPriorityEnum
-from app.core.models.tasks.task import EmployeesTasks
+from app.core.models.tasks.task import EmployeesTasks, TaskComment
 from app.routers.admin.view_models import PositionViewModel
 from app.routers.auth.view_models import CurrentUserViewModel
 
@@ -73,8 +73,32 @@ class TaskExecutorViewModel(BaseModel):
     employee_id: int
 
 
+class TaskCommentViewModel(BaseModel):
+    text: str
+
+
 class TaskStatusViewModel(BaseModel):
     status: TaskStatusEnum
+
+
+class TaskCommentResponse(BaseModel):
+    id: int
+    task_id: int
+    employee_id: int | None = None
+    text: str
+
+    employee: EmployeeResponse | None = None
+
+    @staticmethod
+    def from_model(task_comment: TaskComment):
+        response = TaskCommentResponse(
+            id=task_comment.id,
+            employee_id=task_comment.employee_id,
+            task_id=task_comment.task_id,
+            text=task_comment.text
+        )
+        if 'employee' in task_comment.__dict__ and task_comment.employee:
+            response.employee = EmployeeResponse.from_model(task_comment.employee)
 
 
 class TaskResponse(TaskViewModel):
@@ -86,6 +110,7 @@ class TaskResponse(TaskViewModel):
     executors: List[EmployeeTaskResponse] | None = None
     created_by: EmployeeResponse | None = None
     controller: EmployeeResponse | None = None
+    comments: List[TaskCommentResponse] | None = None
 
     created_at: datetime
     updated_at: datetime
@@ -117,5 +142,8 @@ class TaskResponse(TaskViewModel):
 
         if 'controller' in task.__dict__ and task.controller:
             response.controller = EmployeeResponse.from_model(task.controller)
+
+        if 'comments' in task.__dict__:
+            response.comments = list(map(lambda tc: TaskCommentResponse.from_model(tc), task.comments))
 
         return response

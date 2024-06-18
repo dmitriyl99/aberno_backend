@@ -2,7 +2,7 @@ from typing import List
 from enum import Enum
 from datetime import datetime
 
-from sqlalchemy import String, Text, ForeignKey, Boolean, DateTime
+from sqlalchemy import String, Text, ForeignKey, Boolean, DateTime, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .. import Base, TimestampMixin
@@ -32,6 +32,17 @@ class EmployeesTasks(Base):
     employee: Mapped[Employee] = relationship()
 
 
+class TaskComment(Base):
+    __tablename__ = "task_comments"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    task_id: Mapped[int] = mapped_column(Integer, ForeignKey('tasks.id', ondelete='CASCADE'), nullable=False)
+    employee_id: Mapped[int] = mapped_column(Integer, ForeignKey('employees.id', ondelete='SET NULL'), nullable=True)
+    text: Mapped[str] = mapped_column(Text)
+
+    employee: Mapped[Employee] = relationship(foreign_keys=[employee_id])
+
+
 class Task(Base, TimestampMixin):
     __tablename__ = "tasks"
 
@@ -53,3 +64,4 @@ class Task(Base, TimestampMixin):
     executors: Mapped[List[EmployeesTasks]] = relationship()
     created_by: Mapped[Employee] = relationship(foreign_keys=[created_by_id])
     controller: Mapped[Employee] = relationship(foreign_keys=[controller_employee_id])
+    comments: Mapped[List[TaskComment]] = relationship()

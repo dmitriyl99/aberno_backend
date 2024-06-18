@@ -23,9 +23,13 @@ def upgrade() -> None:
         'employees_tasks',
         sa.Column('employee_id', sa.Integer, sa.ForeignKey('employees.id'), nullable=False),
         sa.Column('task_id', sa.Integer, sa.ForeignKey('tasks.id'), nullable=False),
-        sa.Column('status', sa.String(100), nullable=False)
+        sa.Column('status', sa.String(100), nullable=False),
+        sa.Column('viewed', sa.Boolean, default=False),
+        sa.Column('viewed_at', sa.DateTime, nullable=True)
     )
     op.drop_column('tasks', 'executor_id')
+    op.drop_column('tasks', 'viewed')
+    op.drop_column('tasks', 'viewed_at')
 
 
 def downgrade() -> None:
@@ -35,5 +39,17 @@ def downgrade() -> None:
                       'executor_id',
                       sa.Integer,
                       sa.ForeignKey('employees.id'),
+                      nullable=True)
+                  )
+    op.add_column('tasks',
+                  sa.Column(
+                      'viewed',
+                      sa.Boolean,
+                      default=False)
+                  )
+    op.add_column('tasks',
+                  sa.Column(
+                      'viewed_at',
+                      sa.DateTime,
                       nullable=True)
                   )

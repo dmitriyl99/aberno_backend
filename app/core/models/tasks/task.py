@@ -27,6 +27,8 @@ class EmployeesTasks(Base):
     employee_id: Mapped[int] = mapped_column(ForeignKey('employees.id'), primary_key=True)
     task_id: Mapped[int] = mapped_column(ForeignKey('tasks.id'), primary_key=True)
     status: Mapped[str] = mapped_column(String(100))
+    viewed: Mapped[bool] = mapped_column(Boolean(), default=False)
+    viewed_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     employee: Mapped[Employee] = relationship()
 
 
@@ -43,7 +45,6 @@ class Task(Base, TimestampMixin):
     viewed_at: Mapped[datetime] = mapped_column(DateTime, default=None)
 
     department_id: Mapped[int] = mapped_column(ForeignKey('departments.id'))
-    executor_id: Mapped[str] = mapped_column(ForeignKey('employees.id'))
     created_by_id: Mapped[int] = mapped_column(ForeignKey('employees.id'))
     organization_id: Mapped[int] = mapped_column(ForeignKey('organizations.id'))
 

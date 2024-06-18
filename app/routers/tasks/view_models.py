@@ -64,6 +64,10 @@ class TaskViewModel(BaseModel):
     executors_ids: List[int] | None
 
 
+class TaskExecutorViewModel(BaseModel):
+    employee_id: int
+
+
 class TaskStatusViewModel(BaseModel):
     status: TaskStatusEnum
 
@@ -91,7 +95,6 @@ class TaskResponse(TaskViewModel):
             priority=task.priority,
             deadline=task.deadline,
             department_id=task.department_id,
-            executor_id=task.executor_id,
             status=task.status,
             created_by_id=task.created_by_id,
             created_at=task.created_at,

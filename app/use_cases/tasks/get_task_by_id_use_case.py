@@ -30,7 +30,7 @@ class GetTaskByIdUseCase:
                 joinedload(Task.department),
                 joinedload(Task.executors).joinedload(EmployeesTasks.employee).joinedload(Employee.user),
                 joinedload(Task.created_by).joinedload(Employee.user),
-                joinedload(Task.controller).joinedload(Employee.user),
+                joinedload(Task.controllers).joinedload(Employee.user),
                 joinedload(Task.comments).joinedload(TaskComment.employee).joinedload(Employee.user)
             ).get(task_id)
 

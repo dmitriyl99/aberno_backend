@@ -43,7 +43,7 @@ class ChangeTaskStatusUseCase:
         with self.session() as session:
             task: Task = session.query(Task).options(
                 joinedload(Task.created_by).joinedload(Employee.user),
-                joinedload(Task.controller).joinedload(Employee.user),
+                joinedload(Task.controllers).joinedload(Employee.user),
                 joinedload(Task.executors).joinedload(EmployeesTasks.employee).joinedload(Employee.user)
             ).get(task_id)
             if current_user.is_admin or current_user.is_super_admin or current_employee.id == task.created_by_id:

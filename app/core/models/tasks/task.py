@@ -2,7 +2,7 @@ from typing import List
 from enum import Enum
 from datetime import datetime
 
-from sqlalchemy import String, Text, ForeignKey, Boolean, DateTime, Integer
+from sqlalchemy import String, Text, ForeignKey, Boolean, DateTime, Integer, Table, Column
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .. import Base, TimestampMixin
@@ -32,6 +32,14 @@ class EmployeesTasks(Base):
     employee: Mapped[Employee] = relationship()
 
 
+controller_task_table = Table(
+    "controller_task",
+    Base.metadata,
+    Column("task_id", Integer, ForeignKey('tasks.id', ondelete='CASCADE')),
+    Column("employee_id", Integer, ForeignKey('employees.id', ondelete='CASCADE'))
+)
+
+
 class TaskComment(Base):
     __tablename__ = "task_comments"
 
@@ -58,10 +66,9 @@ class Task(Base, TimestampMixin):
     department_id: Mapped[int] = mapped_column(ForeignKey('departments.id'))
     created_by_id: Mapped[int] = mapped_column(ForeignKey('employees.id'))
     organization_id: Mapped[int] = mapped_column(ForeignKey('organizations.id'))
-    controller_employee_id: Mapped[int] = mapped_column(ForeignKey('employees.id', ondelete='SET NULL'), nullable=True)
 
     department: Mapped[Department] = relationship(foreign_keys=[department_id])
     executors: Mapped[List[EmployeesTasks]] = relationship()
     created_by: Mapped[Employee] = relationship(foreign_keys=[created_by_id])
-    controller: Mapped[Employee] = relationship(foreign_keys=[controller_employee_id])
+    controllers: Mapped[List[Employee]] = relationship(secondary=controller_task_table)
     comments: Mapped[List[TaskComment]] = relationship()

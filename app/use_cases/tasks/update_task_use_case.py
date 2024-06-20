@@ -3,6 +3,7 @@ from sqlalchemy.orm import sessionmaker
 from fastapi import Depends, HTTPException
 from starlette import status
 
+from app.core.models.organization import Employee
 from app.dal import get_session
 from app.core.models.tasks import Task, TaskStatusEnum
 from app.routers.tasks.view_models import TaskViewModel
@@ -37,11 +38,18 @@ class UpdateTaskUseCase:
             task.priority = dto.priority.value,
             task.deadline = dto.deadline,
             task.department_id = dto.department_id,
-            task.controller_employee_id = dto.controller_id
+            if dto.controller_ids is not None:
+                task.controllers.clear()
+                for controller_id in dto.controller_ids:
+                    employee = session.query(Employee).filter(Employee.id == controller_id).first()
+                    if employee:
+                        task.controllers.append(employee)
+            # task.controller_employee_id = dto.controller_id
             session.commit()
             session.refresh(task)
             session.refresh(task.department)
             session.refresh(task.executors)
+            session.refresh(task.controllers)
             session.refresh(task.created_by)
 
             return task

@@ -65,7 +65,7 @@ class TaskViewModel(BaseModel):
     deadline: datetime | None
 
     department_id: int | None
-    controller_id: int | None
+    controller_ids: List[int] | None
     executors_ids: List[int] | None
 
 
@@ -109,7 +109,7 @@ class TaskResponse(TaskViewModel):
     department: DepartmentResponse | None = None
     executors: List[EmployeeTaskResponse] | None = None
     created_by: EmployeeResponse | None = None
-    controller: EmployeeResponse | None = None
+    controllers: List[EmployeeResponse] | None = None
     comments: List[TaskCommentResponse] | None = None
 
     created_at: datetime
@@ -140,8 +140,8 @@ class TaskResponse(TaskViewModel):
         if 'created_by' in task.__dict__ and task.created_by:
             response.created_by = EmployeeResponse.from_model(task.created_by)
 
-        if 'controller' in task.__dict__ and task.controller:
-            response.controller = EmployeeResponse.from_model(task.controller)
+        if 'controllers' in task.__dict__ and task.controllers:
+            response.controllers = list(map(lambda e: EmployeeTaskResponse.from_model(e), task.controllers))
 
         if 'comments' in task.__dict__:
             response.comments = list(map(lambda tc: TaskCommentResponse.from_model(tc), task.comments))

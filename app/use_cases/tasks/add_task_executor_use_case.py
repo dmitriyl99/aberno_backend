@@ -32,7 +32,7 @@ class AddTaskExecutorUseCase:
         with self.session() as session:
             task: Task = session.query(Task).options(
                 joinedload(Task.created_by).joinedload(Employee.user),
-                joinedload(Task.controller).joinedload(Employee.user),
+                joinedload(Task.controllers).joinedload(Employee.user),
                 joinedload(Task.executors).joinedload(EmployeesTasks.employee).joinedload(Employee.user)
             ).get(task_id)
             employee = self.get_employee_by_id_use_case.execute(current_user, employee_id)

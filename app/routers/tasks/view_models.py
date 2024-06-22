@@ -41,7 +41,7 @@ class EmployeeResponse(BaseModel):
 
 
 class EmployeeTaskResponse(BaseModel):
-    employee: EmployeeResponse
+    employee: EmployeeResponse | None = None
     status: TaskStatusEnum
     viewed: bool
     viewed_at: datetime | None = None

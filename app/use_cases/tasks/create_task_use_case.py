@@ -48,7 +48,6 @@ class CreateTaskUseCase:
             session.commit()
             session.refresh(task)
             session.refresh(task.department)
-            session.refresh(task.executors)
             session.refresh(task.created_by)
 
             if task.executors:

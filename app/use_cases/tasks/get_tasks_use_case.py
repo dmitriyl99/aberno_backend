@@ -46,9 +46,9 @@ class GetTasksUseCase:
             if department_id and department_id != 0:
                 query = query.filter(Task.department_id == department_id)
             if executor_id and executor_id != 0:
-                query = query.filter(Task.executors.has(EmployeesTasks.employee_id == executor_id))
+                query = query.filter(Task.executors.any(EmployeesTasks.employee_id == executor_id))
             if controller_id and controller_id != 0:
-                query = query.filter(Task.controllers.has(Employee.id == executor_id))
+                query = query.filter(Task.controllers.any(Employee.id == executor_id))
             if status:
                 statuses = status.split(',')
                 query = query.filter(Task.status.in_(statuses))

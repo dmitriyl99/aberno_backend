@@ -34,7 +34,6 @@ class CreateTaskUseCase:
                 deadline=dto.deadline,
                 organization_id=current_employee.organization_id,
                 department_id=dto.department_id,
-                # controller_employee_id=dto.controller_id,
                 created_by_id=current_employee.id
             )
             session.add(task)
@@ -50,7 +49,6 @@ class CreateTaskUseCase:
             session.refresh(task)
             session.refresh(task.department)
             session.refresh(task.executors)
-            session.refresh(task.controllers)
             session.refresh(task.created_by)
 
             if task.executors:

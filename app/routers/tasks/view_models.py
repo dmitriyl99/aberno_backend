@@ -65,8 +65,8 @@ class TaskViewModel(BaseModel):
     deadline: datetime | None
 
     department_id: int | None
-    controller_ids: List[int] | None
-    executors_ids: List[int] | None
+    controller_ids: List[int] | None = None
+    executors_ids: List[int] | None = None
 
 
 class TaskExecutorViewModel(BaseModel):
@@ -101,10 +101,16 @@ class TaskCommentResponse(BaseModel):
             response.employee = EmployeeResponse.from_model(task_comment.employee)
 
 
-class TaskResponse(TaskViewModel):
+class TaskResponse(BaseModel):
     id: int
     created_by_id: int
     status: TaskStatusEnum
+    title: str
+    description: str | None
+    priority: TaskPriorityEnum | None
+    deadline: datetime | None
+
+    department_id: int | None
 
     department: DepartmentResponse | None = None
     executors: List[EmployeeTaskResponse] | None = None

@@ -25,6 +25,7 @@ class GetTasksUseCase:
     def execute(self,
                 department_id: int | None,
                 executor_id: int | None,
+                controller_id: int | None,
                 status: str | None,
                 priority: str | None,
                 deadline: date | None,
@@ -46,6 +47,8 @@ class GetTasksUseCase:
                 query = query.filter(Task.department_id == department_id)
             if executor_id and executor_id != 0:
                 query = query.filter(Task.executors.has(EmployeesTasks.employee_id == executor_id))
+            if controller_id and controller_id != 0:
+                query = query.filter(Task.controllers.has(Employee.id == executor_id))
             if status:
                 statuses = status.split(',')
                 query = query.filter(Task.status.in_(statuses))

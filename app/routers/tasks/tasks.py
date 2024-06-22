@@ -27,6 +27,7 @@ async def get_tasks(
         get_tasks_use_case: Annotated[GetTasksUseCase, Depends(GetTasksUseCase)],
         department_id: int | None = None,
         executor_id: int | None = None,
+        controller_id: int | None = None,
         status: str | None = None,
         priority: str | None = None,
         deadline: date | None = None,
@@ -36,7 +37,7 @@ async def get_tasks(
         per_page: int = 10
 ):
     tasks, count = get_tasks_use_case.execute(
-        department_id, executor_id, status, priority, deadline, search, created_by_id, page, per_page
+        department_id, executor_id, controller_id, status, priority, deadline, search, created_by_id, page, per_page
     )
 
     return {
@@ -52,6 +53,7 @@ async def get_my_tasks(
         get_tasks_use_case: Annotated[GetTasksUseCase, Depends(GetTasksUseCase)],
         get_current_employee_task: Annotated[GetCurrentEmployeeTask, Depends(GetCurrentEmployeeTask)],
         department_id: int | None = None,
+        controller_id: int | None = None,
         status: str | None = None,
         priority: str | None = None,
         deadline: date | None = None,
@@ -62,7 +64,7 @@ async def get_my_tasks(
 ):
     executor_id = get_current_employee_task.run(Auth.get_current_user()).id
     tasks, count = get_tasks_use_case.execute(
-        department_id, executor_id, status, priority, deadline, search, created_by_id, page, per_page
+        department_id, executor_id, controller_id, status, priority, deadline, search, created_by_id, page, per_page
     )
 
     return {
@@ -78,6 +80,7 @@ async def get_created_by_me(
         get_tasks_use_case: Annotated[GetTasksUseCase, Depends(GetTasksUseCase)],
         get_current_employee_task: Annotated[GetCurrentEmployeeTask, Depends(GetCurrentEmployeeTask)],
         department_id: int | None = None,
+        controller_id: int | None = None,
         executor_id: int | None = None,
         status: str | None = None,
         priority: str | None = None,
@@ -88,7 +91,7 @@ async def get_created_by_me(
 ):
     created_by_id = get_current_employee_task.run(Auth.get_current_user()).id
     tasks, count = get_tasks_use_case.execute(
-        department_id, executor_id, status, priority, deadline, search, created_by_id, page, per_page
+        department_id, executor_id, controller_id, status, priority, deadline, search, created_by_id, page, per_page
     )
 
     return {

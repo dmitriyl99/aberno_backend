@@ -127,9 +127,7 @@ class TaskResponse(TaskViewModel):
             status=task.status,
             created_by_id=task.created_by_id,
             created_at=task.created_at,
-            updated_at=task.updated_at,
-            viewed=task.viewed or False,
-            viewed_at=task.viewed_at
+            updated_at=task.updated_at
         )
         if 'department' in task.__dict__ and task.department:
             response.department = DepartmentResponse.from_model(task.department)

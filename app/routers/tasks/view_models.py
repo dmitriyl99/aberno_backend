@@ -145,7 +145,7 @@ class TaskResponse(BaseModel):
             response.created_by = EmployeeResponse.from_model(task.created_by)
 
         if 'controllers' in task.__dict__ and task.controllers:
-            response.controllers = list(map(lambda e: EmployeeTaskResponse.from_model(e), task.controllers))
+            response.controllers = list(map(lambda e: EmployeeResponse.from_model(e), task.controllers))
 
         if 'comments' in task.__dict__:
             response.comments = list(map(lambda tc: TaskCommentResponse.from_model(tc), task.comments))

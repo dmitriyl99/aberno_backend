@@ -28,7 +28,8 @@ async def get_employees(
         position_id,
         status,
         page,
-        per_page
+        per_page,
+        ['Employee', 'Admin', 'Super Admin']
     )
 
     return {

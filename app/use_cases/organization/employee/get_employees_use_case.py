@@ -27,7 +27,8 @@ class GetEmployeesUseCase:
             position_id: int | None = None,
             employee_status: str | None = None,
             page: int = 1,
-            per_page: int = 10
+            per_page: int = 10,
+            roles: list | None = None,
     ) -> Tuple[List[Type[Employee]], int]:
         if page <= 0 or per_page <= 0:
             raise HTTPException(
@@ -37,6 +38,8 @@ class GetEmployeesUseCase:
 
         current_employee = self.get_current_employee_task.run(user)
         with self.session() as session:
+            if not roles:
+                roles = ['Employee']
             query = session.query(Employee).populate_existing().options(
                 joinedload(Employee.user).joinedload(User.roles),
                 joinedload(Employee.department),
@@ -44,7 +47,7 @@ class GetEmployeesUseCase:
                 joinedload(Employee.position)
             ).filter(
                 Employee.organization_id == current_employee.organization_id,
-                Employee.user.has(User.roles.any(Role.name.in_(['Employee'])))
+                Employee.user.has(User.roles.any(Role.name.in_(roles)))
             )
             if search is not None:
                 query = query.filter(or_(

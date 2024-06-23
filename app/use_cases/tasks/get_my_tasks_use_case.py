@@ -14,7 +14,7 @@ from app.core.facades.auth import Auth
 from app.tasks.organization.get_current_employee_task import GetCurrentEmployeeTask
 
 
-class GetTasksUseCase:
+class GetMyTasksUseCase:
     def __init__(self,
                  session: Annotated[sessionmaker, Depends(get_session)],
                  get_current_employee_task: Annotated[GetCurrentEmployeeTask, Depends(GetCurrentEmployeeTask)]
@@ -24,13 +24,12 @@ class GetTasksUseCase:
 
     def execute(self,
                 department_id: int | None,
-                executor_id: int | None,
+                user_id: int | None,
                 controller_id: int | None,
                 status: str | None,
                 priority: str | None,
                 deadline: date | None,
                 search: str | None,
-                created_by_id: int | None,
                 page: int = 1,
                 per_page: int = 10
                 ):
@@ -45,8 +44,8 @@ class GetTasksUseCase:
             ).filter(Task.organization_id == current_employee.organization_id)
             if department_id and department_id != 0:
                 query = query.filter(Task.department_id == department_id)
-            if executor_id and executor_id != 0:
-                query = query.filter(Task.executors.any(EmployeesTasks.employee_id == executor_id))
+            if user_id and user_id != 0:
+                query = query.filter(or_(Task.executors.any(EmployeesTasks.employee_id == user_id), Task.created_by_id == user_id))
             if controller_id and controller_id != 0:
                 query = query.filter(Task.controllers.any(Employee.id == controller_id))
             if status:
@@ -56,8 +55,6 @@ class GetTasksUseCase:
                 query = query.filter(Task.priority == priority)
             if deadline and deadline != 0:
                 query = query.filter(Task.deadline == deadline)
-            if created_by_id:
-                query = query.filter(Task.created_by_id == created_by_id)
             if search:
                 query = query.filter(
                     or_(Task.title.ilike(f'%{search}%'), Task.description.ilike(f'%{search}%'),

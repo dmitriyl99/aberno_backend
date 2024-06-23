@@ -17,6 +17,7 @@ from app.core.facades.auth import Auth
 from ...tasks.organization.get_current_employee_task import GetCurrentEmployeeTask
 from ...use_cases.tasks.add_task_executor_use_case import AddTaskExecutorUseCase
 from ...use_cases.tasks.comments.add_task_comment_use_case import AddTaskCommentUseCase
+from ...use_cases.tasks.get_my_tasks_use_case import GetMyTasksUseCase
 from ...use_cases.tasks.remove_task_executor_use_case import RemoveTaskExecutorUseCase
 
 router = APIRouter(prefix='/tasks', tags=['tasks'], dependencies=[Depends(verify_authenticated_user)])
@@ -50,7 +51,7 @@ async def get_tasks(
 
 @router.get('/my-tasks')
 async def get_my_tasks(
-        get_tasks_use_case: Annotated[GetTasksUseCase, Depends(GetTasksUseCase)],
+        get_tasks_use_case: Annotated[GetMyTasksUseCase, Depends(GetMyTasksUseCase)],
         get_current_employee_task: Annotated[GetCurrentEmployeeTask, Depends(GetCurrentEmployeeTask)],
         department_id: int | None = None,
         controller_id: int | None = None,
@@ -64,7 +65,7 @@ async def get_my_tasks(
 ):
     executor_id = get_current_employee_task.run(Auth.get_current_user()).id
     tasks, count = get_tasks_use_case.execute(
-        department_id, executor_id, controller_id, status, priority, deadline, search, created_by_id, page, per_page
+        department_id, executor_id, controller_id, status, priority, deadline, search, page, per_page
     )
 
     return {

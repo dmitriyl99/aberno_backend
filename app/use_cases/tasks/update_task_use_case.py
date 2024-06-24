@@ -33,11 +33,12 @@ class UpdateTaskUseCase:
                         status_code=status.HTTP_403_FORBIDDEN,
                         detail='You do not have permission to update this task'
                     )
-            task.title = dto.title,
-            task.description = dto.description,
-            task.priority = dto.priority.value,
-            task.deadline = dto.deadline,
-            task.department_id = dto.department_id,
+            task.title = dto.title
+            task.description = dto.description
+            task.priority = dto.priority.value
+            task.deadline = dto.deadline
+            task.deadline_end = dto.deadline_end
+            task.department_id = dto.department_id
             if dto.controller_ids is not None:
                 task.controllers.clear()
                 for controller_id in dto.controller_ids:

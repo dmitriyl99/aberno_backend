@@ -63,6 +63,7 @@ class TaskViewModel(BaseModel):
     description: str | None
     priority: TaskPriorityEnum | None
     deadline: datetime | None
+    deadline_end: datetime | None = None
 
     department_id: int | None
     controller_ids: List[int] | None = None
@@ -109,6 +110,7 @@ class TaskResponse(BaseModel):
     description: str | None
     priority: TaskPriorityEnum | None
     deadline: datetime | None
+    deadline_end: datetime | None
 
     department_id: int | None
 
@@ -129,6 +131,7 @@ class TaskResponse(BaseModel):
             description=task.description,
             priority=task.priority,
             deadline=task.deadline,
+            deadline_end=task.deadline_end,
             department_id=task.department_id,
             status=task.status,
             created_by_id=task.created_by_id,

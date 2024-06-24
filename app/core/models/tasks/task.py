@@ -59,7 +59,8 @@ class Task(Base, TimestampMixin):
     description: Mapped[str] = mapped_column(Text)
     status: Mapped[str] = mapped_column(String(100))
     priority: Mapped[str] = mapped_column(String(50))
-    deadline: Mapped[datetime] = mapped_column(DateTime)
+    deadline: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    deadline_end: Mapped[datetime] = mapped_column(DateTime, nullable=True)
 
     department_id: Mapped[int] = mapped_column(ForeignKey('departments.id'))
     created_by_id: Mapped[int] = mapped_column(ForeignKey('employees.id'))

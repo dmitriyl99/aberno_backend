@@ -87,6 +87,8 @@ class TaskCommentResponse(BaseModel):
     task_id: int
     employee_id: int | None = None
     text: str
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
 
     employee: EmployeeResponse | None = None
 
@@ -96,7 +98,9 @@ class TaskCommentResponse(BaseModel):
             id=task_comment.id,
             employee_id=task_comment.employee_id,
             task_id=task_comment.task_id,
-            text=task_comment.text
+            text=task_comment.text,
+            created_at=task_comment.created_at,
+            updated_at=task_comment.updated_at,
         )
         if 'employee' in task_comment.__dict__ and task_comment.employee:
             response.employee = EmployeeResponse.from_model(task_comment.employee)

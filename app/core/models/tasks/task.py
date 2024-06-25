@@ -40,7 +40,7 @@ controller_task_table = Table(
 )
 
 
-class TaskComment(Base):
+class TaskComment(Base, TimestampMixin):
     __tablename__ = "task_comments"
 
     id: Mapped[int] = mapped_column(primary_key=True)

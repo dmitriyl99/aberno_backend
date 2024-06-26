@@ -26,7 +26,6 @@ class ChangeTaskStatusUseCase:
         def _refresh_entity(session, task: Task):
             session.refresh(task)
             session.refresh(task.created_by)
-            session.refresh(task.executors)
 
         def _send_notification(task: Task):
             try:

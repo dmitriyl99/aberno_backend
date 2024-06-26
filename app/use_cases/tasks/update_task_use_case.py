@@ -49,8 +49,6 @@ class UpdateTaskUseCase:
             session.commit()
             session.refresh(task)
             session.refresh(task.department)
-            session.refresh(task.executors)
-            session.refresh(task.controllers)
             session.refresh(task.created_by)
 
             return task

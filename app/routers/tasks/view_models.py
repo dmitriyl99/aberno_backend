@@ -104,6 +104,7 @@ class TaskCommentResponse(BaseModel):
         )
         if 'employee' in task_comment.__dict__ and task_comment.employee:
             response.employee = EmployeeResponse.from_model(task_comment.employee)
+        return response
 
 
 class TaskResponse(BaseModel):

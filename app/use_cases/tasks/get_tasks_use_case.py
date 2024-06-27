@@ -64,7 +64,7 @@ class GetTasksUseCase:
                 query = query.filter(
                     or_(Task.title.ilike(f'%{search}%'), Task.description.ilike(f'%{search}%'),
                         Task.created_by.has(Employee.user.has(User.name.ilike(f'f%{search}%'))),
-                        Task.executors.has(
+                        Task.executors.any(
                             EmployeesTasks.employee.has(Employee.user.has(User.name.ilike(f'%{search}%'))))
                         )
                 )

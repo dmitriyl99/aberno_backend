@@ -58,6 +58,16 @@ class EmployeeTaskResponse(BaseModel):
         return response
 
 
+class ControllerTaskResponse(BaseModel):
+    employee: EmployeeResponse | None = None
+
+    @staticmethod
+    def from_model(employee: Employee):
+        return ControllerTaskResponse(
+            employee=EmployeeResponse.from_model(employee)
+        )
+
+
 class TaskViewModel(BaseModel):
     title: str
     description: str | None
@@ -153,7 +163,7 @@ class TaskResponse(BaseModel):
             response.created_by = EmployeeResponse.from_model(task.created_by)
 
         if 'controllers' in task.__dict__ and task.controllers:
-            response.controllers = list(map(lambda e: EmployeeResponse.from_model(e), task.controllers))
+            response.controllers = list(map(lambda e: ControllerTaskResponse.from_model(e), task.controllers))
 
         if 'comments' in task.__dict__:
             response.comments = list(map(lambda tc: TaskCommentResponse.from_model(tc), task.comments))

@@ -29,9 +29,13 @@ class GetTaskByIdUseCase:
             task: Task = session.query(Task).options(
                 joinedload(Task.department),
                 joinedload(Task.executors).joinedload(EmployeesTasks.employee).options(joinedload(Employee.user),
-                                                                                       joinedload(Employee.position)),
+                                                                                       joinedload(Employee.position),
+                                                                                       joinedload(Employee.department),
+                                                                                       joinedload(Employee.created_by)),
                 joinedload(Task.created_by).options(joinedload(Employee.user), joinedload(Employee.position)),
-                joinedload(Task.controllers).options(joinedload(Employee.user), joinedload(Employee.position)),
+                joinedload(Task.controllers).options(joinedload(Employee.user), joinedload(Employee.position),
+                                                     joinedload(Employee.department),
+                                                    joinedload(Employee.created_by)),
                 joinedload(Task.comments).joinedload(TaskComment.employee).options(joinedload(Employee.user),
                                                                                    joinedload(Employee.position))
             ).get(task_id)

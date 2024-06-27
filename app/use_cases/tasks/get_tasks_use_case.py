@@ -40,10 +40,13 @@ class GetTasksUseCase:
             query = session.query(Task).options(
                 joinedload(Task.department),
                 joinedload(Task.executors).joinedload(EmployeesTasks.employee).options(joinedload(Employee.user),
-                                                                                       joinedload(Employee.position)),
+                                                                                       joinedload(Employee.position),
+                                                                                       joinedload(Employee.department),
+                                                                                       joinedload(Employee.created_by)),
                 joinedload(Task.created_by).options(joinedload(Employee.user), joinedload(Employee.position)),
                 joinedload(Task.controllers).options(joinedload(Employee.user),
-                                                     joinedload(Employee.position)).joinedload(Employee.user)
+                                                     joinedload(Employee.position),joinedload(Employee.department),
+                                                                                       joinedload(Employee.created_by)).joinedload(Employee.user)
             ).filter(Task.organization_id == current_employee.organization_id)
             if department_id and department_id != 0:
                 query = query.filter(Task.department_id == department_id)

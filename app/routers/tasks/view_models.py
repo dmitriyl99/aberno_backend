@@ -34,7 +34,7 @@ class EmployeeResponse(BaseModel):
         )
         if 'user' in employee.__dict__:
             response.user = CurrentUserViewModel.from_model(employee.user)
-        if 'position' in employee.__dict__:
+        if 'position' in employee.__dict__ and employee.position:
             response.position = PositionViewModel.from_model(employee.position)
 
         return response

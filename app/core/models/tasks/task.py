@@ -70,4 +70,4 @@ class Task(Base, TimestampMixin):
     executors: Mapped[List[EmployeesTasks]] = relationship()
     created_by: Mapped[Employee] = relationship(foreign_keys=[created_by_id])
     controllers: Mapped[List[Employee]] = relationship(secondary=controller_task_table)
-    comments: Mapped[List[TaskComment]] = relationship()
+    comments: Mapped[List[TaskComment]] = relationship(cascade="all, delete-orphan")

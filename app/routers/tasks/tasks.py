@@ -2,6 +2,7 @@ from datetime import date
 from typing import List, Annotated
 
 from fastapi import APIRouter, Depends, status as http_status
+from starlette import status
 
 from app.dependencies import verify_authenticated_user
 from .view_models import TaskResponse, TaskViewModel, TaskStatusViewModel, TaskExecutorViewModel, TaskCommentResponse, \
@@ -19,6 +20,7 @@ from ...use_cases.tasks.add_task_executor_use_case import AddTaskExecutorUseCase
 from ...use_cases.tasks.comments.add_task_comment_use_case import AddTaskCommentUseCase
 from ...use_cases.tasks.get_my_tasks_use_case import GetMyTasksUseCase
 from ...use_cases.tasks.remove_task_executor_use_case import RemoveTaskExecutorUseCase
+from ...use_cases.tasks.remove_task_use_case import RemoveTaskUseCase
 
 router = APIRouter(prefix='/tasks', tags=['tasks'], dependencies=[Depends(verify_authenticated_user)])
 
@@ -141,6 +143,14 @@ async def update_task(
     task = update_task_use_case.execute(task_id, dto)
 
     return TaskResponse.from_model(task)
+
+
+@router.delete('/{task_id}', status_code=status.HTTP_204_NO_CONTENT)
+async def delete_task(
+        task_id: int,
+        remove_task_use_case: Annotated[RemoveTaskUseCase, Depends(RemoveTaskUseCase)]
+):
+    remove_task_use_case.execute(task_id)
 
 
 @router.post('/{task_id}/executor', response_model=TaskResponse)

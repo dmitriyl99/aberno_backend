@@ -132,7 +132,7 @@ class TaskResponse(BaseModel):
     department: DepartmentResponse | None = None
     executors: List[EmployeeTaskResponse] | None = None
     created_by: EmployeeResponse | None = None
-    controllers: List[EmployeeResponse] | None = None
+    controllers: List[ControllerTaskResponse] | None = None
     comments: List[TaskCommentResponse] | None = None
 
     created_at: datetime

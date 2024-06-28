@@ -47,7 +47,7 @@ class RemoveTaskExecutorUseCase:
                         status_code=status.HTTP_403_FORBIDDEN,
                         detail='You do not have permission to update this task'
                     )
-            executors_with_id = list(filter(lambda e: e.id == employee_id, task.executors))
+            executors_with_id = list(filter(lambda e: e.employee_id == employee_id, task.executors))
             executor_exists = len(executors_with_id) > 0
             if not executor_exists:
                 raise HTTPException(

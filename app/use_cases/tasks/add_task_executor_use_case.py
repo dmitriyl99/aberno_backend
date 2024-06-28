@@ -61,7 +61,6 @@ class AddTaskExecutorUseCase:
             task.executors.append(EmployeesTasks(employee_id=employee_id, status=TaskStatusEnum.PENDING.value))
             session.commit()
             session.refresh(task)
-            session.refresh(task.executors)
 
             self.send_notification_task.run(
                 f"Вам назначена задача {task.title}",

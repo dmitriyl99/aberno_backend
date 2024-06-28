@@ -63,6 +63,5 @@ class RemoveTaskExecutorUseCase:
             session.delete(executor)
             session.commit()
             session.refresh(task)
-            session.refresh(task.executors)
 
             return task

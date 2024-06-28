@@ -67,7 +67,7 @@ class Task(Base, TimestampMixin):
     organization_id: Mapped[int] = mapped_column(ForeignKey('organizations.id'))
 
     department: Mapped[Department] = relationship(foreign_keys=[department_id])
-    executors: Mapped[List[EmployeesTasks]] = relationship()
+    executors: Mapped[List[EmployeesTasks]] = relationship(cascade='all, delete-orphan')
     created_by: Mapped[Employee] = relationship(foreign_keys=[created_by_id])
     controllers: Mapped[List[Employee]] = relationship(secondary=controller_task_table)
     comments: Mapped[List[TaskComment]] = relationship(cascade="all, delete-orphan")

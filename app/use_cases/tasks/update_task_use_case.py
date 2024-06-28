@@ -5,7 +5,7 @@ from starlette import status
 
 from app.core.models.organization import Employee
 from app.dal import get_session
-from app.core.models.tasks import Task, TaskStatusEnum
+from app.core.models.tasks import Task
 from app.routers.tasks.view_models import TaskViewModel
 from app.core.facades.auth import Auth
 from app.tasks.organization.get_current_employee_task import GetCurrentEmployeeTask
@@ -27,6 +27,11 @@ class UpdateTaskUseCase:
         current_employee = self.get_current_employee_task.run(current_user)
         with self.session() as session:
             task: Task = session.query(Task).get(task_id)
+            if not task:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Task not found"
+                )
             if not current_user.is_super_admin or not current_user.is_admin:
                 if current_employee.id != task.created_by_id:
                     raise HTTPException(

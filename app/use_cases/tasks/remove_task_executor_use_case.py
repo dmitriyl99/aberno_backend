@@ -35,6 +35,11 @@ class RemoveTaskExecutorUseCase:
                 joinedload(Task.controllers).joinedload(Employee.user),
                 joinedload(Task.executors).joinedload(EmployeesTasks.employee).joinedload(Employee.user)
             ).get(task_id)
+            if not task:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Task not found"
+                )
             employee = self.get_employee_by_id_use_case.execute(current_user, employee_id)
             if employee is None:
                 raise HTTPException(

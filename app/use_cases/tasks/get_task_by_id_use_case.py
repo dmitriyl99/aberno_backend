@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Annotated
 
 from sqlalchemy.orm import sessionmaker, joinedload
-from fastapi import Depends
+from fastapi import Depends, HTTPException, status
 
 from app.core.models.organization import Employee
 from app.core.models.tasks.task import EmployeesTasks, TaskComment
@@ -39,6 +39,11 @@ class GetTaskByIdUseCase:
                 joinedload(Task.comments).joinedload(TaskComment.employee).options(joinedload(Employee.user),
                                                                                    joinedload(Employee.position))
             ).get(task_id)
+            if not task:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Task not found"
+                )
 
             if current_employee.id in list(map(lambda et: et.employee_id, task.executors)):
                 employee_task: EmployeesTasks = list(filter(lambda et: et.employee_id == current_employee.id, task.executors))[0]

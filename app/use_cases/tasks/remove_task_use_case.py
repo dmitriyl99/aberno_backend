@@ -1,12 +1,9 @@
-from datetime import datetime
 from typing import Annotated
 
 from sqlalchemy.orm import sessionmaker, joinedload
 from fastapi import Depends, HTTPException
 from starlette import status
 
-from app.core.models.organization import Employee
-from app.core.models.tasks.task import EmployeesTasks, TaskComment
 from app.dal import get_session
 from app.core.models.tasks import Task
 from app.core.facades.auth import Auth
@@ -32,7 +29,13 @@ class RemoveTaskUseCase:
                 joinedload(Task.executors),
                 joinedload(Task.controllers)
             ).get(task_id)
-            if not current_user.is_admin and not current_user.is_super_admin and not current_employee.id == task.created_by_id:
+            if not task:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Task not found"
+                )
+            if not current_user.is_admin and not current_user.is_super_admin and (
+                    not current_employee.id == task.created_by_id):
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail='You do not have permission to perform this action'

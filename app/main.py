@@ -28,7 +28,8 @@ app = FastAPI(debug=settings.environment in ['local', 'debug'], title="Aberno AP
 
 origins = [
     "http://localhost:5173",
-    'https://aberno-app.com'
+    'https://aberno-app.com',
+    'https://rozmetov-app.com'
 ]
 
 app.add_middleware(

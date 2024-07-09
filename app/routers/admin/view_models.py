@@ -22,7 +22,7 @@ class ScheduleDayEnum(str, Enum):
 
 class ScheduleDayViewModel(BaseModel):
     day: ScheduleDayEnum
-    is_work_day: bool
+    is_work_day: bool = True
     work_start_time: str | None = None
     work_end_time: str | None = None
     roll_call_start_time: str | None = None
@@ -32,6 +32,7 @@ class ScheduleDayViewModel(BaseModel):
     def from_model(day):
         return ScheduleDayViewModel(
             day=day.day,
+            is_work_day=day.is_work_day,
             work_start_time=day.work_start_time,
             work_end_time=day.work_end_time,
             roll_call_start_time=day.roll_call_start_time,

@@ -22,7 +22,7 @@ class ScheduleDayEnum(str, Enum):
 
 class ScheduleDayViewModel(BaseModel):
     day: ScheduleDayEnum
-    is_work_day: bool = True
+    is_work_day: bool
     work_start_time: str | None = None
     work_end_time: str | None = None
     roll_call_start_time: str | None = None

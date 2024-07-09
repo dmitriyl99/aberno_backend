@@ -153,7 +153,7 @@ class CreateRollCallUseCase:
         elif data.status == RollCallStatusEnum.OFF_DAY:
             today = date.today()
             schedule_day = get_current_schedule_day()
-            if schedule_day and not schedule_day.is_work_day:
+            if schedule_day and schedule_day.is_work_day:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail='Today is not weekend'

@@ -62,7 +62,7 @@ class Task(Base, TimestampMixin):
     deadline: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     deadline_end: Mapped[datetime] = mapped_column(DateTime, nullable=True)
 
-    department_id: Mapped[int] = mapped_column(ForeignKey('departments.id'))
+    department_id: Mapped[int] = mapped_column(ForeignKey('departments.id', ondelete='CASCADE'))
     created_by_id: Mapped[int] = mapped_column(ForeignKey('employees.id'))
     organization_id: Mapped[int] = mapped_column(ForeignKey('organizations.id'))
 

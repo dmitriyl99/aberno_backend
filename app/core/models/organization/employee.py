@@ -20,7 +20,7 @@ class Employee(Base, TimestampMixin):
 
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     organization_id: Mapped[int] = mapped_column(ForeignKey("organizations.id"))
-    department_id: Mapped[int] = mapped_column(ForeignKey("departments.id"))
+    department_id: Mapped[int] = mapped_column(ForeignKey("departments.id", ondelete='CASCADE'))
     created_by_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     position_id: Mapped[int] = mapped_column(ForeignKey("positions.id"))
 

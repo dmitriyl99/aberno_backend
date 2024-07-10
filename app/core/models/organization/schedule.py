@@ -25,4 +25,4 @@ class ScheduleDay(Base):
     work_end_time: Mapped[str] = mapped_column(String(5))
     roll_call_start_time: Mapped[str] = mapped_column(String(5))
     roll_call_end_time: Mapped[str] = mapped_column(String(5))
-    schedule_id: Mapped[int] = mapped_column(ForeignKey('schedules.id'))
+    schedule_id: Mapped[int] = mapped_column(ForeignKey('schedules.id', ondelete='CASCADE'))

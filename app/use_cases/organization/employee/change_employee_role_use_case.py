@@ -33,7 +33,7 @@ class ChangeEmployeeRoleUseCase:
                 raise error
             if current_employee.organization_id != employee.organization_id and not current_user.is_super_admin:
                 raise error
-            if not current_user.is_admin:
+            if not (current_user.is_admin or current_user.is_super_admin):
                 raise error
             user: User = employee.user
             user.roles.clear()

@@ -20,7 +20,7 @@ class GetDepartmentsUseCase:
         current_user = Auth.get_current_user()
         with self.session() as session:
             if not current_user.is_super_admin:
-                current_employee: Type[Employee] = session.query(Employee).filter(
+                current_employee: Employee = session.query(Employee).filter(
                     Employee.user_id == current_user.id
                 ).first()
                 organization_id = current_employee.organization_id

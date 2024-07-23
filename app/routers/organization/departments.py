@@ -26,7 +26,7 @@ async def get_departments(
         organization_id = current_employee.organization_id
         query = session.query(Department).options(
             joinedload(Department.organization)
-        )
+        ).filter(Department.organization_id == organization_id)
         if search is not None:
             query = query.filter(or_(
                 Department.name.ilike(f"%{search}%"),

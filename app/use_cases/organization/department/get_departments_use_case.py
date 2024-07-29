@@ -1,4 +1,4 @@
-from typing import Annotated, List, Type
+from typing import Annotated, List, Type, Tuple
 
 from sqlalchemy import or_
 from sqlalchemy.orm import sessionmaker, joinedload
@@ -16,11 +16,14 @@ class GetDepartmentsUseCase:
         self.session = session
 
     def execute(self, search: str | None = None,
-                organization_id: int | None = None) -> List[Type[Department]]:
+                organization_id: int | None = None,
+                page: int = 1,
+                per_page: int = 10,
+                ) -> Tuple[int, List[Type[Department]]]:
         current_user = Auth.get_current_user()
         with self.session() as session:
             if not current_user.is_super_admin:
-                current_employee: Employee = session.query(Employee).filter(
+                current_employee: Type[Employee] = session.query(Employee).filter(
                     Employee.user_id == current_user.id
                 ).first()
                 organization_id = current_employee.organization_id
@@ -33,4 +36,6 @@ class GetDepartmentsUseCase:
                 ))
             if organization_id is not None:
                 query = query.filter(Department.organization_id == organization_id)
-            return query.all()
+            count = query.count()
+            query = query.limit(per_page).offset((page - 1) * per_page)
+            return count, query.all()

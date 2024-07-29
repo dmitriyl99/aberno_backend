@@ -3,7 +3,7 @@ from typing import Annotated, List
 from fastapi import APIRouter, Depends, status, HTTPException
 
 from app.use_cases.organization.department import (CreateDepartmentUseCase, GetDepartmentByIdUseCase,
-                                                   GetDepartmentsUseCase, UpdateDepartmentUseCase, 
+                                                   GetDepartmentsUseCase, UpdateDepartmentUseCase,
                                                    DeleteDepartmentUseCase, CreateDepartmentScheduleUseCase)
 from .view_models import CreateDepartmentViewModel, DepartmentResponse, ScheduleDayViewModel
 
@@ -15,14 +15,19 @@ async def get_departments(
         get_departments_use_case: Annotated[GetDepartmentsUseCase, Depends(GetDepartmentsUseCase)],
         organization_id: int | None = None,
         search: str | None = None,
+        page: int = 1,
+        per_page: int = 10
 ):
-    departments = get_departments_use_case.execute(search, organization_id)
+    count, departments = get_departments_use_case.execute(search, organization_id, page, per_page)
 
-    return list(
-        map(
-            lambda department: DepartmentResponse.from_model(department), departments
+    return {
+        'count': count,
+        'data': list(
+            map(
+                lambda department: DepartmentResponse.from_model(department), departments
+            )
         )
-    )
+    }
 
 
 @router.get('/{department_id}', response_model=DepartmentResponse)
@@ -37,15 +42,15 @@ async def get_department(
             detail='Department with id {} not found'.format(department_id)
         )
 
-    return DepartmentResponse.from_model(department)\
-
-
-
+    return DepartmentResponse.from_model(department) \
+ \
+ \
 @router.post('/{department_id}/schedule',
              status_code=status.HTTP_201_CREATED, response_model=List[ScheduleDayViewModel])
 async def create_schedule(
         department_id: int,
-        create_department_schedule_use_case: Annotated[CreateDepartmentScheduleUseCase, Depends(CreateDepartmentScheduleUseCase)],
+        create_department_schedule_use_case: Annotated[
+            CreateDepartmentScheduleUseCase, Depends(CreateDepartmentScheduleUseCase)],
         days: List[ScheduleDayViewModel]
 ):
     unique_days = set(map(lambda day: day.day.value, days))

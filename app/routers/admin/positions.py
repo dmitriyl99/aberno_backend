@@ -1,6 +1,6 @@
 from typing import Annotated, List
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from starlette import status
 
 from app.use_cases.organization.positions import (
@@ -10,6 +10,7 @@ from app.use_cases.organization.positions import (
     GetPositionsUseCase
 )
 from .view_models import PositionViewModel, CreatePositionViewModel
+from ...use_cases.organization.positions.get_position_by_id_use_case import GetPositionByIdUseCase
 
 router = APIRouter(prefix='/positions', tags=['positions'])
 
@@ -24,6 +25,21 @@ def get_positions(
     return list(
         map(lambda position: PositionViewModel.from_model(position), positions)
     )
+
+
+@router.get('/{position_id}', response_model=PositionViewModel)
+def get_positions(
+        get_position_by_id_use_case: Annotated[GetPositionByIdUseCase, Depends(GetPositionByIdUseCase)],
+        position_id: int | None = None,
+):
+    position = get_position_by_id_use_case.execute(position_id)
+    if not position:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Position not found'
+        )
+    return PositionViewModel.from_model(position)
+
 
 @router.post('/', response_model=PositionViewModel)
 def create_position(

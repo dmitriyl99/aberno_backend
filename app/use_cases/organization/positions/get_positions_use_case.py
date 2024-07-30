@@ -1,4 +1,4 @@
-from typing import Annotated, List, Type
+from typing import Annotated, List, Type, Tuple
 
 from fastapi import Depends
 from sqlalchemy.orm import sessionmaker
@@ -18,7 +18,12 @@ class GetPositionsUseCase:
         self.session = session
         self.get_current_employee_task = get_current_employee_task
 
-    def execute(self, organization_id: int | None, department_id: int | None) -> List[Position] | List[Type[Position]]:
+    def execute(
+            self, organization_id: int | None,
+            department_id: int | None,
+            page: int = 1,
+            per_page: int = 10,
+    ) -> Tuple[int, List[Position] | List[Type[Position]]]:
         current_user = Auth.get_current_user()
         current_employee = self.get_current_employee_task.run(current_user)
         if (organization_id and not current_user.is_super_admin) or (not organization_id):
@@ -29,4 +34,6 @@ class GetPositionsUseCase:
                 query = query.filter(Position.organization_id == organization_id)
             if department_id:
                 query = query.filter(Position.department_id == department_id)
-            return query.all()
+            count = query.count()
+            query = query.limit(per_page).offset((page - 1) * per_page)
+            return count, query.all()

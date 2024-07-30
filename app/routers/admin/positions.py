@@ -11,7 +11,6 @@ from app.use_cases.organization.positions import (
 )
 from .view_models import PositionViewModel, CreatePositionViewModel
 
-
 router = APIRouter(prefix='/positions', tags=['positions'])
 
 
@@ -19,12 +18,17 @@ router = APIRouter(prefix='/positions', tags=['positions'])
 def get_positions(
         get_positions_use_case: Annotated[GetPositionsUseCase, Depends(GetPositionsUseCase)],
         organization_id: int | None = None,
-        department_id: int | None = None
+        department_id: int | None = None,
+        page: int = 1,
+        per_page: int = 10
 ):
-    return list(
-        map(lambda position: PositionViewModel.from_model(position),
-            get_positions_use_case.execute(organization_id, department_id))
-    )
+    count, positions = get_positions_use_case.execute(organization_id, department_id, page, per_page)
+    return {
+        'count': count,
+        'data': list(
+            map(lambda position: PositionViewModel.from_model(position), positions)
+        )
+    }
 
 
 @router.post('/', response_model=PositionViewModel)

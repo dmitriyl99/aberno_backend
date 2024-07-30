@@ -10,6 +10,7 @@ from app.core.models import TimestampMixin
 from app.core.models.auth.user import User
 from app.core.models.organization.organization import Organization
 from app.core.models.organization.department import Department
+from app.core.models.organization.schedule import Schedule, ScheduleType
 from ..roll_call.roll_call import RollCall
 
 
@@ -17,6 +18,7 @@ class Employee(Base, TimestampMixin):
     __tablename__ = "employees"
     id: Mapped[int] = mapped_column(primary_key=True)
     phone: Mapped[str] = mapped_column(String(12))
+    schedule_type: Mapped[str] = mapped_column(String(50), default=ScheduleType.ORGANIZATION)
 
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     organization_id: Mapped[int] = mapped_column(ForeignKey("organizations.id"))
@@ -30,3 +32,4 @@ class Employee(Base, TimestampMixin):
     position: Mapped["Position"] = relationship(foreign_keys=[])
     roll_calls: Mapped[List["RollCall"]] = relationship(back_populates='employee')
     created_by: Mapped["User"] = relationship(foreign_keys=[created_by_id])
+    schedule: Mapped["Schedule"] = relationship(uselist=False)

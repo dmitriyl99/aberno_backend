@@ -8,7 +8,7 @@ from starlette import status
 
 from datetime import date, datetime
 
-from app.core.models.organization.schedule import ScheduleDay
+from app.core.models.organization.schedule import ScheduleDay, ScheduleType
 from app.core.models.roll_call.sick_leave import SickLeave
 from app.dal import get_session
 from app.routers.admin.view_models import ScheduleDayEnum
@@ -38,7 +38,12 @@ class CreateRollCallUseCase:
         department = self.get_department_by_id_use_case.execute(employee.department_id)
 
         def get_current_schedule_day() -> ScheduleDay | None:
-            if department.schedule:
+            schedule = None
+            if employee.schedule_type == ScheduleType.DEPARTMENT:
+                schedule = department.schedule
+            if employee.schedule_type == ScheduleType.PERSONAL:
+                schedule = employee.schedule
+            if schedule:
                 weekday = now.isoweekday()
                 weekdays_mapper = {
                     1: ScheduleDayEnum.MONDAY,
@@ -51,7 +56,7 @@ class CreateRollCallUseCase:
                 }
                 schedule_day: ScheduleDay = list(
                     filter(
-                        lambda day: day.day == weekdays_mapper[weekday], department.schedule.days
+                        lambda day: day.day == weekdays_mapper[weekday], schedule.days
                     )
                 )[0]
 
@@ -136,9 +141,10 @@ class CreateRollCallUseCase:
             roll_call_end_time_parsed = ['11', '00']
             if organization.settings and organization.settings.roll_call_end_time:
                 roll_call_end_time_parsed = organization.settings.roll_call_end_time.split(':')
-            schedule_day = get_current_schedule_day()
-            if schedule_day and schedule_day.roll_call_end_time:
-                roll_call_end_time_parsed = schedule_day.roll_call_end_time.split(':')
+            if employee.schedule_type != ScheduleType.ORGANIZATION:
+                schedule_day = get_current_schedule_day()
+                if schedule_day and schedule_day.roll_call_end_time:
+                    roll_call_end_time_parsed = schedule_day.roll_call_end_time.split(':')
             if roll_call_end_time_parsed:
                 roll_call_end_time = datetime(
                     now.year,

@@ -1,16 +1,24 @@
 from typing import List
+from enum import Enum
 
 from .. import Base, TimestampMixin
 
-from sqlalchemy import Integer, ForeignKey, String, Boolean
+from sqlalchemy import ForeignKey, String, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+
+class ScheduleType(Enum):
+    ORGANIZATION = 'ORGANIZATION'
+    DEPARTMENT = 'DEPARTMENT'
+    PERSONAL = 'PERSONAL'
 
 
 class Schedule(TimestampMixin, Base):
     __tablename__ = 'schedules'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    department_id: Mapped[int] = mapped_column(ForeignKey('departments.id'))
+    department_id: Mapped[int] = mapped_column(ForeignKey('departments.id'), nullable=True)
+    employee_id: Mapped[int] = mapped_column(ForeignKey('employees.id'), nullable=True)
 
     days: Mapped[List["ScheduleDay"]] = relationship(lazy='joined')
 

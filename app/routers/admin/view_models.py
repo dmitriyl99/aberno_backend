@@ -130,6 +130,7 @@ class EmployeeResponse(BaseModel):
     department: DepartmentResponse | None = None
     position: PositionViewModel | None = None
     created_by: CurrentUserViewModel | None = None
+    schedule: List[ScheduleDayViewModel] | None = None
 
     created_at: datetime
     updated_at: datetime
@@ -154,6 +155,8 @@ class EmployeeResponse(BaseModel):
                 name=model.created_by.name,
                 last_name=model.created_by.last_name
             )
+        if 'schedule' in model.__dict__ and model.schedule:
+            response.schedule = list(map(ScheduleDayViewModel.from_model, model.schedule.days))
         return response
 
 

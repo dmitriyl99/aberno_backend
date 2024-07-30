@@ -4,6 +4,7 @@ from fastapi import Depends
 
 from app.core.models.auth.user import User
 from app.core.models.organization import Organization
+from app.core.models.organization.schedule import Schedule
 from app.core.models.organization.employee import Employee
 from app.dal import get_session
 
@@ -19,7 +20,8 @@ class GetCurrentEmployeeTask:
             employee: Type[Employee] = session.query(Employee).filter(Employee.user_id == user.id).options(
                 joinedload(Employee.organization).joinedload(Organization.settings),
                 joinedload(Employee.department), joinedload(Employee.user).joinedload(User.roles),
-                joinedload(Employee.position)
+                joinedload(Employee.position),
+                joinedload(Employee.schedule).joinedload(Schedule.days)
             ).first()
 
         return employee

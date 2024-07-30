@@ -25,7 +25,6 @@ def get_positions(
         map(lambda position: PositionViewModel.from_model(position), positions)
     )
 
-
 @router.post('/', response_model=PositionViewModel)
 def create_position(
         create_position_use_case: Annotated[CreatePositionUseCase, Depends(CreatePositionUseCase)],

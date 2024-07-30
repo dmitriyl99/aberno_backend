@@ -6,7 +6,7 @@ from fastapi import Depends
 
 from app.core.facades.auth import Auth
 from app.dal import get_session
-from app.core.models.organization import Department, Employee
+from app.core.models.organization import Department, Employee, Schedule
 
 
 class GetDepartmentsUseCase:
@@ -16,7 +16,8 @@ class GetDepartmentsUseCase:
         self.session = session
 
     def execute(self, search: str | None = None,
-                organization_id: int | None = None) -> List[Type[Department]]:
+                organization_id: int | None = None,
+                load_schedule: bool = False) -> List[Type[Department]]:
         current_user = Auth.get_current_user()
         with self.session() as session:
             if not current_user.is_super_admin:
@@ -33,4 +34,6 @@ class GetDepartmentsUseCase:
                 ))
             if organization_id is not None:
                 query = query.filter(Department.organization_id == organization_id)
+            if load_schedule:
+                query = query.options(joinedload(Department.schedule).joinedload(Schedule.days))
             return query.all()

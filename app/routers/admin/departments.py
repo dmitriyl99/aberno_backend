@@ -15,8 +15,9 @@ async def get_departments(
         get_departments_use_case: Annotated[GetDepartmentsUseCase, Depends(GetDepartmentsUseCase)],
         organization_id: int | None = None,
         search: str | None = None,
+        load_schedule: bool = False
 ):
-    departments = get_departments_use_case.execute(search, organization_id)
+    departments = get_departments_use_case.execute(search, organization_id, load_schedule)
 
     return list(
         map(

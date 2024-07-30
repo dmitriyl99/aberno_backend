@@ -20,9 +20,7 @@ class GetPositionsUseCase:
 
     def execute(
             self, organization_id: int | None,
-            department_id: int | None,
-            page: int = 1,
-            per_page: int = 10,
+            department_id: int | None
     ) -> Tuple[int, List[Position] | List[Type[Position]]]:
         current_user = Auth.get_current_user()
         current_employee = self.get_current_employee_task.run(current_user)
@@ -34,6 +32,4 @@ class GetPositionsUseCase:
                 query = query.filter(Position.organization_id == organization_id)
             if department_id:
                 query = query.filter(Position.department_id == department_id)
-            count = query.count()
-            query = query.limit(per_page).offset((page - 1) * per_page)
-            return count, query.all()
+            return query.all()

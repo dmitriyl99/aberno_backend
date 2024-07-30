@@ -51,6 +51,7 @@ class UpdateEmployeeUseCase:
                 return None
             employee.department_id = data.department_id
             employee.position_id = data.position_id
+            employee.schedule_type = data.schedule_type.value()
             phone = data.phone
             if phone.startswith('+'):
                 phone = phone[1:]

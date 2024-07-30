@@ -7,7 +7,7 @@ from passlib.context import CryptContext
 
 from app.dal import get_session
 from app.core.models.auth import User, Role
-from app.core.models.organization import Employee
+from app.core.models.organization import Employee, ScheduleType
 from app.routers.admin.view_models import CreateEmployeeViewModel
 from app.tasks.organization.get_current_employee_task import GetCurrentEmployeeTask
 
@@ -81,7 +81,8 @@ class CreateEmployeeUseCase:
                 user_id=user.id,
                 department_id=data.department_id,
                 organization_id=organization_id,
-                created_by_id=current_user.id
+                created_by_id=current_user.id,
+                schedule_type=data.schedule_type.value() if data.schedule_type else ScheduleType.ORGANIZATION
             )
             session.add(employee)
             session.commit()

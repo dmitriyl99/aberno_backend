@@ -4,7 +4,7 @@ from typing import List, Any
 
 from pydantic import BaseModel
 
-from app.core.models.organization import Organization, Department, Employee
+from app.core.models.organization import Organization, Department, Employee, ScheduleType
 from app.core.models.organization.organization_settings import OrganizationSettings
 from app.core.models.organization.position import Position
 from app.routers.auth.view_models import CurrentUserViewModel
@@ -59,6 +59,7 @@ class CreateEmployeeViewModel(BaseModel):
     username: str | None = None
     password: str | None = None
     password_confirmation: str | None = None
+    schedule_type: ScheduleType | None = None
 
     position_id: int | None = None
     phone: str

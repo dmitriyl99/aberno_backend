@@ -1,6 +1,6 @@
 import datetime
 from datetime import date, timedelta
-from typing import Annotated
+from typing import Annotated, List
 import calendar
 
 from fastapi import APIRouter, Depends, status, HTTPException
@@ -17,9 +17,10 @@ from app.use_cases.organization.employee import (
 )
 from app.core.facades.auth import Auth
 
-from .view_models import CreateEmployeeViewModel, EmployeeResponse, ChangeRoleViewModel
+from .view_models import CreateEmployeeViewModel, EmployeeResponse, ChangeRoleViewModel, ScheduleDayViewModel
 from ...core.models.roll_call.roll_call import RollCall, RollCallStatusEnum
 from ...use_cases.organization.employee.change_employee_role_use_case import ChangeEmployeeRoleUseCase
+from ...use_cases.organization.employee.create_employee_schedule_use_case import CreateEmployeeScheduleUseCase
 from ...use_cases.organization.employee.get_admins_use_case import GetAdminsUseCase
 from ...use_cases.roll_call.get_roll_call_history_user_case import GetRollCallHistoryUseCase
 
@@ -172,8 +173,9 @@ async def get_employee_roll_call_history(
                 leave_work_time = date_roll_call.created_at
                 on_work_roll_call = list(
                     filter(
-                        lambda rch: rch.created_at.date() == current_date and rch.status in [RollCallStatusEnum.ON_WORK.value,
-                                                                                             RollCallStatusEnum.LATE.value],
+                        lambda rch: rch.created_at.date() == current_date and rch.status in [
+                            RollCallStatusEnum.ON_WORK.value,
+                            RollCallStatusEnum.LATE.value],
                         roll_call_history
                     )
                 )
@@ -234,6 +236,27 @@ async def update_employee(
         raise HTTPException(status_code=404, detail="Employee not found")
 
     return EmployeeResponse.from_model(employee)
+
+
+@router.post('/{employee_id}/schedule',
+             status_code=status.HTTP_201_CREATED, response_model=List[ScheduleDayViewModel])
+async def create_schedule(
+        employee_id: int,
+        create_employee_schedule_use_case: Annotated[
+            CreateEmployeeScheduleUseCase, Depends(CreateEmployeeScheduleUseCase)],
+        days: List[ScheduleDayViewModel]
+):
+    unique_days = set(map(lambda day: day.day.value, days))
+    if len(unique_days) != 7:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='The week is not full'
+        )
+    schedule = create_employee_schedule_use_case.execute(employee_id, days)
+
+    return list(
+        map(lambda day: ScheduleDayViewModel.from_model(day), schedule)
+    )
 
 
 @router.put("/{employee_id}/reactivate", status_code=status.HTTP_204_NO_CONTENT)
